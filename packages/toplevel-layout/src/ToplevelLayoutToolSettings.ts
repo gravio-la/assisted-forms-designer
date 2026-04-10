@@ -40,6 +40,13 @@ const jsonSchema: JsonSchema = {
       description: '0–24 (MUI shadows). Leave empty for the default elevation.',
       i18n: 'toplevelLayout.cardElevation',
     },
+    fullWidth: {
+      type: 'boolean',
+      title: 'Full width layout',
+      description:
+        'Use the full content width for the card. Turn on for wide layouts (categorization, steppers). Default is a narrow column for typical forms.',
+      i18n: 'toplevelLayout.fullWidth',
+    },
   },
 }
 
@@ -54,6 +61,7 @@ const mapWizardSchemaToToolData = (_wizardSchema: JsonSchema | null, uiSchema: u
     colorTheme: (opts?.colorTheme as ColorThemeId | undefined) ?? 'default',
     image: (opts?.image as string | undefined) ?? '',
     disableRoundedBox: opts?.disableRoundedBox === true,
+    fullWidth: opts?.fullWidth === true,
     cardElevation:
       typeof opts?.cardElevation === 'number' && Number.isFinite(opts.cardElevation)
         ? opts.cardElevation
@@ -79,6 +87,7 @@ const mapToolDataToWizardUischema = (toolData: unknown, wizardUiSchema: unknown)
     colorTheme?: ColorThemeId
     image?: string
     disableRoundedBox?: boolean
+    fullWidth?: boolean
     cardElevation?: number
   }
 
@@ -114,6 +123,12 @@ const mapToolDataToWizardUischema = (toolData: unknown, wizardUiSchema: unknown)
     options.disableRoundedBox = true
   } else {
     delete options.disableRoundedBox
+  }
+
+  if (td.fullWidth === true) {
+    options.fullWidth = true
+  } else {
+    delete options.fullWidth
   }
 
   if (

@@ -47,6 +47,11 @@ export type TopLevelLayoutUISchema = Layout & {
      * MUI `Card` elevation 0–24. When unset, the layout uses its built-in default (6).
      */
     cardElevation?: number
+    /**
+     * When true, the outer `Container` uses full content width (`maxWidth={false}`).
+     * Use for wide layouts (categorization, steppers). Default is a narrow column (`maxWidth="sm"`).
+     */
+    fullWidth?: boolean
   }
 }
 
@@ -126,6 +131,7 @@ function ToplevelLayoutView({
     image,
     disableRoundedBox,
     cardElevation: cardElevationOption,
+    fullWidth,
   } = options
   const displayHeadline = useDefaultTopLevelHeadline(headline)
 
@@ -155,7 +161,7 @@ function ToplevelLayoutView({
         bgcolor: 'transparent',
       }}
     >
-      <Container maxWidth="sm" disableGutters>
+      <Container maxWidth={fullWidth ? false : 'sm'} disableGutters>
         <Card
           elevation={resolvedElevation}
           onClick={onCardClick}

@@ -16,6 +16,10 @@ export const translations: LanguageTranslations = {
     'toplevelLayout.cardElevation.description':
       '0–24 (MUI elevation). Leave empty for the default (6).',
 
+    'toplevelLayout.fullWidth.label': 'Full width layout',
+    'toplevelLayout.fullWidth.description':
+      'Use the full content width for the card. Turn on for wide layouts (categorization, steppers). Default is a narrow column for typical forms.',
+
     'toplevelLayout.colorTheme.default': 'App default',
     'toplevelLayout.colorTheme.linen': 'Linen (light)',
     'toplevelLayout.colorTheme.mist': 'Mist (light)',
@@ -43,6 +47,10 @@ export const translations: LanguageTranslations = {
     'toplevelLayout.cardElevation.label': 'Karten-Elevation',
     'toplevelLayout.cardElevation.description':
       '0–24 (MUI-Elevation). Leer lassen für Standard (6).',
+
+    'toplevelLayout.fullWidth.label': 'Volle Breite',
+    'toplevelLayout.fullWidth.description':
+      'Nutzt die volle Inhaltsbreite für die Karte. Für breite Layouts (Kategorisierung, Stepper). Standard ist eine schmale Spalte für typische Formulare.',
 
     'toplevelLayout.colorTheme.default': 'App-Standard',
     'toplevelLayout.colorTheme.linen': 'Leinen (hell)',
