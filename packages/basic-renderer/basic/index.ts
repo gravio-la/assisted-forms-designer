@@ -2,9 +2,10 @@ import MaterialEnumArrayWithLabelRendererWithProps, {
   materialEnumArrayWithLabelRendererTester,
 } from './MultiEnumArrayRendererWithLabel'
 import MaterialAlertRendererWithProps, { materialAlertRendererTester } from './MaterialAlertRenderer'
-
 export * from './MaterialAlertRenderer'
 export * from './MultiEnumArrayRendererWithLabel'
+export * from './MaterialTextControlDesigner'
+export * from './MuiInputTextDesigner'
 
 export const basicRenderer = [
   {

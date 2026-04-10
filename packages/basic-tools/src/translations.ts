@@ -17,6 +17,7 @@ export const translations: LanguageTranslations = {
   en: {
     // --- TextfieldToolSettings ---
     'multiline.label': 'Multiline',
+    'multilineRows.label': 'Visible rows',
 
     // --- NumberInputToolSettings ---
     'min.label': 'Minimum value',
@@ -73,6 +74,7 @@ export const translations: LanguageTranslations = {
   de: {
     // --- TextfieldToolSettings ---
     'multiline.label': 'Mehrzeilig',
+    'multilineRows.label': 'Sichtbare Zeilen',
 
     // --- NumberInputToolSettings ---
     'min.label': 'Mindestwert',

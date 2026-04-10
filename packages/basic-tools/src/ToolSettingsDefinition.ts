@@ -6,6 +6,7 @@ import CategorizationToolSettings from './settings/CategorizationToolSettings'
 import LabelToolSetting from './settings/LabelToolSettings'
 import AlertToolSetting from './settings/AlertToolSettings'
 import TextfieldToolSettings from './settings/TextfieldToolSettings'
+import FormattedStringToolSettings from './settings/FormattedStringToolSettings'
 import CheckToolSettings from './settings/CheckToolSettings'
 import NumberInputToolSettings from './settings/NumberInputToolSettings'
 import { ToolSettings } from '@formswizard/types'
@@ -19,6 +20,7 @@ export const ToolSettingsDefinitions: ToolSettings = [
   LabelToolSetting,
   AlertToolSetting,
   TextfieldToolSettings,
+  FormattedStringToolSettings,
   CheckToolSettings,
   NumberInputToolSettings,
 ]

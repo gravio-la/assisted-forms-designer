@@ -69,6 +69,7 @@ export const draggableComponents: DraggableElement[] = [
       type: 'Control',
       options: {
         multi: true,
+        minRows: 3,
       },
     },
   },
