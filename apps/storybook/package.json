@@ -10,7 +10,12 @@
     "upgrade": "npx storybook@latest upgrade"
   },
   "dependencies": {
+    "@formswizard/advanced-tools": "workspace:*",
+    "@formswizard/basic-tools": "workspace:*",
+    "@formswizard/forms-designer": "workspace:*",
     "@formswizard/i18n": "workspace:*",
+    "@formswizard/toplevel-layout": "workspace:*",
+    "@formswizard/tool-context": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "@ebay/nice-modal-react": "^1.2.13",

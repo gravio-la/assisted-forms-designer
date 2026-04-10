@@ -1,0 +1,56 @@
+{
+  "name": "@formswizard/toplevel-layout",
+  "version": "0.0.1",
+  "description": "TopLevelLayout JSON Forms renderer with themed card chrome and image upload for tool settings",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "bun test src",
+    "lint": "eslint \"src/**/*.ts*\"",
+    "lint-fix": "eslint --fix \"src/**/*.ts*\"",
+    "push": "bun publish --access public"
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "@jsonforms/core": "catalog:",
+    "@jsonforms/material-renderers": "catalog:",
+    "@jsonforms/react": "catalog:",
+    "@mui/icons-material": "catalog:",
+    "@mui/material": "catalog:",
+    "react": "^18.0.0",
+    "react-redux": "^9.0.0"
+  },
+  "dependencies": {
+    "@formswizard/i18n": "workspace:*",
+    "@formswizard/state": "workspace:*",
+    "@formswizard/types": "workspace:*",
+    "@formswizard/upload-tools": "workspace:*",
+    "ajv": "catalog:"
+  },
+  "devDependencies": {
+    "@formswizard/designer-tsconfig": "workspace:*",
+    "@formswizard/tsup-config": "workspace:*",
+    "@jsonforms/material-renderers": "catalog:",
+    "@storybook/react": "^7.2.0",
+    "@types/react": "catalog:",
+    "eslint": "^9.36.0",
+    "eslint-config-formsdesigner": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "^5.0.0"
+  }
+}
