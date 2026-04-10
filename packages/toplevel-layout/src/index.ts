@@ -12,5 +12,11 @@ export {
   type TopLevelLayoutUISchema,
 } from './ToplevelLayoutRenderer'
 export { ToplevelLayoutToolSettings } from './ToplevelLayoutToolSettings'
+export {
+  AvailableFontsProvider,
+  useAvailableFonts,
+  type FontDefinition,
+  type AvailableFontsProviderProps,
+} from './AvailableFontsContext'
 export { toplevelLayoutCollection } from './toplevelLayoutCollection'
 export { translations as toplevelLayoutTranslations } from './translations'

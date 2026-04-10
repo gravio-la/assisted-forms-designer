@@ -31,6 +31,7 @@ import {
   useAppSelector,
 } from '@formswizard/state'
 import { ColorThemeId, getThemeOptionsForColorPreset, usesParentTopLevelTheme } from './colorThemes'
+import { useAvailableFonts } from './AvailableFontsContext'
 
 export type TopLevelLayoutUISchema = Layout & {
   type: 'TopLevelLayout'
@@ -39,6 +40,8 @@ export type TopLevelLayoutUISchema = Layout & {
     headline?: string
     description?: string
     colorTheme?: ColorThemeId
+    /** Font family ID as registered in AvailableFontsProvider. When unset, the theme default is used. */
+    fontFamily?: string
     /** Data URL of hero image */
     image?: string
     /** When true, card corners are square (no border radius). */
@@ -128,12 +131,16 @@ function ToplevelLayoutView({
     headline,
     description,
     colorTheme = 'default',
+    fontFamily,
     image,
     disableRoundedBox,
     cardElevation: cardElevationOption,
     fullWidth,
   } = options
   const displayHeadline = useDefaultTopLevelHeadline(headline)
+
+  const availableFonts = useAvailableFonts()
+  const fontFamilyString = availableFonts.find((f) => f.id === fontFamily)?.fontFamily
 
   const resolvedElevation =
     typeof cardElevationOption === 'number' && Number.isFinite(cardElevationOption)
@@ -145,8 +152,12 @@ function ToplevelLayoutView({
   }
 
   const nestColorPresetTheme = !usesParentTopLevelTheme(colorTheme)
-  const nestedTheme = nestColorPresetTheme
-    ? createTheme(getThemeOptionsForColorPreset(colorTheme as ColorThemeId))
+  const nestTheme = nestColorPresetTheme || !!fontFamilyString
+  const nestedTheme = nestTheme
+    ? createTheme({
+        ...getThemeOptionsForColorPreset(colorTheme as ColorThemeId),
+        ...(fontFamilyString ? { typography: { fontFamily: fontFamilyString } } : {}),
+      })
     : null
 
   const elements = layout.elements ?? []
@@ -242,6 +253,7 @@ function ToplevelLayoutView({
     return <ThemeProvider theme={nestedTheme}>{body}</ThemeProvider>
   }
   return body
+
 }
 
 /**

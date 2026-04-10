@@ -4,6 +4,7 @@ import type { FormsDesignerToolCollection } from '@formswizard/types'
 import { imageBlobUploadRendererEntry } from '@formswizard/upload-tools'
 import { toplevelLayoutRendererEntry } from './ToplevelLayoutRenderer'
 import { ToplevelLayoutToolSettings } from './ToplevelLayoutToolSettings'
+import { fontFamilyControlEntry } from './FontFamilyControl'
 import { translations } from './translations'
 
 /** TopLevel tool-settings schema uses `format: data-url` for the header image — register for FieldSettingsView AJV. */
@@ -17,7 +18,7 @@ export const toplevelLayoutCollection: FormsDesignerToolCollection = {
     categories: ['layout'],
   },
   rendererRegistry: [toplevelLayoutRendererEntry],
-  settingsRendererRegistry: [imageBlobUploadRendererEntry],
+  settingsRendererRegistry: [imageBlobUploadRendererEntry, fontFamilyControlEntry],
   cellRendererRegistry: materialCells,
   toolSettings: [ToplevelLayoutToolSettings],
   ajvFormatRegistry: {

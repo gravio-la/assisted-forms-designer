@@ -20,6 +20,12 @@ const jsonSchema: JsonSchema = {
       i18n: 'toplevelLayout.colorTheme',
       enum: [...COLOR_THEME_IDS],
     },
+    fontFamily: {
+      type: 'string',
+      title: 'Font',
+      i18n: 'toplevelLayout.fontFamily',
+      format: 'font-family',
+    },
     image: {
       type: 'string',
       title: 'Header image',
@@ -59,6 +65,7 @@ const mapWizardSchemaToToolData = (_wizardSchema: JsonSchema | null, uiSchema: u
     headline: (opts?.headline as string | undefined) ?? '',
     description: (opts?.description as string | undefined) ?? '',
     colorTheme: (opts?.colorTheme as ColorThemeId | undefined) ?? 'default',
+    fontFamily: (opts?.fontFamily as string | undefined) ?? 'default',
     image: (opts?.image as string | undefined) ?? '',
     disableRoundedBox: opts?.disableRoundedBox === true,
     fullWidth: opts?.fullWidth === true,
@@ -85,6 +92,7 @@ const mapToolDataToWizardUischema = (toolData: unknown, wizardUiSchema: unknown)
     headline?: string
     description?: string
     colorTheme?: ColorThemeId
+    fontFamily?: string
     image?: string
     disableRoundedBox?: boolean
     fullWidth?: boolean
@@ -111,6 +119,12 @@ const mapToolDataToWizardUischema = (toolData: unknown, wizardUiSchema: unknown)
     options.colorTheme = td.colorTheme
   } else if (td.colorTheme === 'default') {
     delete options.colorTheme
+  }
+
+  if (td.fontFamily !== undefined && td.fontFamily !== 'default') {
+    options.fontFamily = td.fontFamily
+  } else {
+    delete options.fontFamily
   }
 
   if (td.image !== undefined && td.image !== '') {
