@@ -7,10 +7,6 @@ import type { UISchemaElement } from '@jsonforms/core'
 export const DEFAULT_ROOT_UI_SCHEMA: UISchemaElement = {
   type: 'TopLevelLayout',
   elements: [
-    {
-      type: 'VerticalLayout',
-      elements: [],
-    },
   ],
   options: {
     colorTheme: 'default',
