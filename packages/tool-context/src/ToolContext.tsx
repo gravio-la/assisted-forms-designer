@@ -31,6 +31,10 @@ export const ToolProvider = <T extends JsonSchema = JsonSchema>({
             ...acc.rendererRegistry,
             ...(collection.rendererRegistry || []),
           ],
+          settingsRendererRegistry: [
+            ...acc.settingsRendererRegistry,
+            ...(collection.settingsRendererRegistry || []),
+          ],
           cellRendererRegistry: [
             ...acc.cellRendererRegistry,
             ...(collection.cellRendererRegistry || []),
@@ -62,6 +66,7 @@ export const ToolProvider = <T extends JsonSchema = JsonSchema>({
       {
         iconRegistry: {} as Record<string, any>,
         rendererRegistry: [] as any[],
+        settingsRendererRegistry: [] as any[],
         cellRendererRegistry: [] as any[],
         ajvFormatRegistry: {} as Record<string, any>,
         toolSettings: [] as any[],
@@ -98,6 +103,7 @@ export const useToolContext = <T extends JsonSchema = JsonSchema>(): ToolContext
     return {
       iconRegistry: {},
       rendererRegistry: [],
+      settingsRendererRegistry: [],
       cellRendererRegistry: [],
       ajvFormatRegistry: {},
       toolSettings: [],

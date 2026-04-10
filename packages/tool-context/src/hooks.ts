@@ -150,3 +150,18 @@ export const usePreparedJsonFormsState = (options: PreparedJsonFormsStateOptions
 
   return { renderers, cells, ajv, i18n }
 }
+
+/** AJV for the field-settings JsonForms (tool panels) — same format merge as the main canvas. */
+export const useToolSettingsAjv = (): Ajv => {
+  const ownAjvFormats = useAjvFormatRegistry()
+  return useMemo(
+    () =>
+      createAjv({
+        formats: {
+          ...formatsPlugin.formats,
+          ...ownAjvFormats,
+        },
+      }),
+    [ownAjvFormats]
+  )
+}
