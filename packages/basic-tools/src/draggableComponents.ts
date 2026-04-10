@@ -5,7 +5,6 @@ export const draggableComponents: DraggableElement[] = [
   {
     name: 'label',
     ToolIconName: 'Label',
-    jsonSchemaElement: {},
     uiSchema: {
       type: 'Label',
       //@ts-ignore
@@ -16,7 +15,6 @@ export const draggableComponents: DraggableElement[] = [
   {
     name: 'alert',
     ToolIconName: 'Info',
-    jsonSchemaElement: {},
     uiSchema: {
       type: 'Alert',
       //@ts-ignore
