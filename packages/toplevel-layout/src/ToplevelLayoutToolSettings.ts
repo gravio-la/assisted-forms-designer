@@ -166,7 +166,7 @@ export const ToplevelLayoutToolSettings: ToolSetting = {
       type: 'Control',
       scope: '#/properties/image',
       options: {
-        maxImageBytes: 512 * 1024,
+        maxImageBytes: 1024 * 1024,
       },
     },
   },
