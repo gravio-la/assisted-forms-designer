@@ -145,14 +145,12 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
       >
         {appBar || (isMobile
           ? (
-            <Box component="header" sx={{ flexShrink: 0 }}>
               <MobileAppBar
                 leftDrawerOpen={mobileLeftOpen}
                 onToggleLeftDrawer={() => setMobileLeftOpen((v) => !v)}
                 rightDrawerOpen={mobileRightOpen}
                 onToggleRightDrawer={() => setMobileRightOpen((v) => !v)}
               />
-            </Box>
             )
           : (
             <MainAppBar />
@@ -180,7 +178,7 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
                 },
               }}
             >
-              <Toolbar />
+              <Toolbar variant="dense" sx={{ minHeight: { xs: 48 } }} />
               <Toolbox />
             </Drawer>
             <Container
@@ -193,7 +191,7 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
                 ...shellRowBgSx,
               }}
             >
-              <Toolbar />
+              <Toolbar variant="dense" sx={{ minHeight: { xs: 48 } }} />
               <Box display="flex" flexDirection="row" alignItems='center'>
                 {multipleDefinitions && <>
                   <Tabs

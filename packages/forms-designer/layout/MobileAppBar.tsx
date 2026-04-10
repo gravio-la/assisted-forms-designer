@@ -94,7 +94,7 @@ export function MobileAppBar({
 
   return (
     <>
-      <AppBar position="sticky" sx={{ zIndex: (t) => t.zIndex.drawer + 1 }}>
+      <AppBar position="fixed" sx={{ zIndex: (t) => t.zIndex.drawer + 1 }}>
         <Toolbar variant="dense" sx={{ justifyContent: 'space-between', minHeight: { xs: 48 } }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 48 }}>
             {showLeftDrawerToggle && (
