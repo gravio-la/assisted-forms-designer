@@ -18,6 +18,27 @@ FormsDesigner allows for the easy and efficient creation of forms, producing JSO
 
 The FormsDesigner is a part of the broader FormsWizard project, which delivers a complete No-Code solution to form creation and management, with synchronization and serverless operations brought by the FormsWizard project as a whole.
 
+## Tool collections
+
+Features of the designer (toolbox entries, JsonForms renderers, field-settings editors, translations, AJV formats) are packaged as **tool collections**: objects of type `FormsDesignerToolCollection` from `@formswizard/types`. The app wraps the UI in `<ToolProvider toolCollections={…}>` (`packages/tool-context`), which merges every collection into one registry the hooks read from.
+
+**Important distinction:** `rendererRegistry` feeds the **main** designer / preview JsonForms (the canvas). `settingsRendererRegistry` feeds **only** the field-settings JsonForms in the right drawer (`materialRenderers` + these entries). They are separate arrays; if a custom control must appear in both places, register the same renderer entry in both. `cellRendererRegistry`, `toolSettings`, `ajvFormatRegistry`, `translations`, `iconRegistry`, and `draggableElements` are merged as documented in the generated `toolCollection.ts` (see the hygen template JSDoc in `_templates/forms-designer/tool-collection/toolCollection.ts.t`).
+
+### Create a new tool collection package
+
+From the repository root:
+
+```sh
+bunx hygen forms-designer tool-collection
+```
+
+You will be prompted for the npm package name (convention: `@formswizard/<short-name>`) and a description. Hygen writes a new package under `packages/<short-name>/` (source, `package.json`, `tsup` config, stubs for renderers, icons, draggable components, tool settings, and translations).
+
+Because workspaces are `apps/*` and `packages/*`, the new folder is already part of the monorepo. Run `bun install` and `bun run build --filter <your-package>` (or a full `bun run build`) so dependents resolve.
+
+### Register the collection in the app
+
+Import your `…ToolCollection` export and pass it in the `toolCollections` array on `ToolProvider`, for example in `apps/vite/src/main.tsx` or `packages/forms-designer/WizardApp.tsx`. Order matters where merge order matters (e.g. renderer lists are concatenated in the order of the array).
 
 ## Apps and Packages
 
