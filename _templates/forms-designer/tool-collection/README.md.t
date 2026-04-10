@@ -5,29 +5,35 @@ to: packages/<%= name.split("/")[1] %>/README.md
 
 <%= description %>
 
-## Installation
+This package is part of the FormsDesigner monorepo (`packages/*`). Peer dependencies use the root **catalog** (`catalog:` in `package.json`).
 
-```bash
-npm install <%= name %>
+## Development
+
+From the monorepo root:
+
+```sh
+bun install
+cd packages/<%= name.split("/")[1] %> && bun run build && bun test
 ```
 
-## Usage
+Or from the root with Turborepo: `turbo run build --filter=<%= name %>`.
+
+## Usage in an app
+
+Import the collection and pass it to `ToolProvider` (see `apps/vite/src/main.tsx` or `packages/forms-designer/WizardApp.tsx`):
 
 ```typescript
 import { <%= name.split("/")[1].replace(/-/g, '') %>ToolCollection } from '<%= name %>'
 
-// Use the tool collection in your forms designer
-const { draggableComponents, icons, renderers } = <%= name.split("/")[1].replace(/-/g, '') %>ToolCollection
+<ToolProvider
+  toolCollections={[
+    // …other collections,
+    <%= name.split("/")[1].replace(/-/g, '') %>ToolCollection,
+  ]}
+>
 ```
 
-## Components
-
-This package includes:
-
-- **Draggable Components**: Form components that can be dragged into the designer
-- **Icons**: Icon components for the toolbox
-- **Renderers**: JsonForms renderers for displaying the components
-- **Tool Settings**: Configuration options for each component
+See `src/toolCollection.ts` for how registries (`rendererRegistry`, optional `settingsRendererRegistry`, etc.) are wired, and the repository root `README.md` section **Tool collections**.
 
 ## License
 

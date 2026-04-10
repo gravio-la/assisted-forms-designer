@@ -3,7 +3,7 @@ to: packages/<%= name.split("/")[1] %>/package.json
 ---
 {
   "name": "<%= name %>",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "<%= description %>",
   "license": "MIT",
   "homepage": "https://github.com/FormsWizard",
@@ -11,8 +11,7 @@ to: packages/<%= name.split("/")[1] %>/package.json
     "type": "git",
     "url": "https://github.com/FormsWizard/forms-designer.git"
   },
-  "contributors": [
-  ],
+  "contributors": [],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -34,21 +33,20 @@ to: packages/<%= name.split("/")[1] %>/package.json
     "depcheck": "depcheck",
     "build": "tsup",
     "dev": "tsup --watch",
+    "test": "bun test src",
     "lint": "eslint src/**/*.{ts,tsx}",
     "lint-fix": "eslint --fix src/**/*.{ts,tsx}",
-    "pack-clean": "bun run clean-package && (bun pm pack || true) ; bun run clean-package restore",
-    "publish-clean": "bun run clean-package && npm publish --access public && bun run clean-package restore"
+    "push": "bun publish --access public"
   },
   "peerDependencies": {
-    "@jsonforms/core": "^3",
-    "@jsonforms/material-renderers": "^3",
-    "@jsonforms/react": "^3",
-    "@mui/icons-material": "^5",
-    "@mui/material": "^5",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "react": "^16.9.0 || ^17.0.0 || ^18",
-    "react-dnd": "^16.0.1"
+    "@jsonforms/core": "catalog:",
+    "@jsonforms/material-renderers": "catalog:",
+    "@jsonforms/react": "catalog:",
+    "@mui/icons-material": "catalog:",
+    "@mui/material": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "react": "catalog:"
   },
   "dependencies": {
     "@formswizard/types": "workspace:*",

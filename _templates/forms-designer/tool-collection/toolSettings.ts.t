@@ -1,12 +1,7 @@
 ---
 to: packages/<%= name.split("/")[1] %>/src/toolSettings.ts
 ---
-import { FieldSettings } from '@formswizard/types'
+import type { ToolSettings } from '@formswizard/types'
 
-export const toolSettings: Record<string, FieldSettings> = {
-  // Add your tool settings here
-  // Example:
-  // ExampleComponent: {
-  //   // Field settings configuration
-  // },
-}
+/** `ToolSetting` entries (`packages/types`) for the field-settings panel — one per control/layout that exposes options. */
+export const toolSettings: ToolSettings = []

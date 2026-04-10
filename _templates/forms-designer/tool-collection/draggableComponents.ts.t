@@ -1,16 +1,7 @@
 ---
 to: packages/<%= name.split("/")[1] %>/src/draggableComponents.ts
 ---
-import { DraggableElement } from '@formswizard/types'
+import type { DraggableElement } from '@formswizard/types'
 
-export const draggableComponents: DraggableElement[] = [
-  // Add your draggable components here
-  // Example:
-  // {
-  //   name: 'Example Component',
-  //   ToolIconName: 'ExampleIcon',
-  //   jsonSchemaElement: {
-  //     type: 'string',
-  //   },
-  // },
-]
+/** Toolbox entries (palette). Prefer `jsonSchemaElement` + optional `uiSchema` per `DraggableElement`. */
+export const draggableComponents: DraggableElement[] = []
