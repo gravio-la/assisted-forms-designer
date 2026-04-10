@@ -3,7 +3,7 @@ import type { LanguageTranslations } from '@formswizard/types'
 export const translations: LanguageTranslations = {
   en: {
     'imageUpload.chooseImage': 'Choose image',
-    'imageUpload.remove': 'Remove',
+    'imageUpload.remove': 'Remove image',
     'imageUpload.readError': 'Could not read file.',
     'imageUpload.invalidType':
       'Invalid type: {{type}}. Use JPEG, PNG, WebP, or SVG.',
@@ -20,7 +20,7 @@ export const translations: LanguageTranslations = {
   },
   de: {
     'imageUpload.chooseImage': 'Bild auswählen',
-    'imageUpload.remove': 'Entfernen',
+    'imageUpload.remove': 'Bild Entfernen',
     'imageUpload.readError': 'Datei konnte nicht gelesen werden.',
     'imageUpload.invalidType':
       'Ungültiger Typ: {{type}}. Verwende JPEG, PNG, WebP oder SVG.',
