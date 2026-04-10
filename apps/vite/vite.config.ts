@@ -6,8 +6,17 @@ import { visualizer } from 'rollup-plugin-visualizer'
 export default defineConfig({
   // Wrap with slashes so Vite gets the correct sub-path for GitHub Pages.
   base: process.env.VITE_BASE_PATH ? `/${process.env.VITE_BASE_PATH}/` : '/',
+  /** Workspace packages can pull a second copy of React; react-i18next then sees null hooks. */
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+  },
   optimizeDeps: {
-    include: ['i18next', 'react-i18next'],
+    include: [
+      'react',
+      'react-dom',
+      'i18next',
+      'react-i18next',
+    ],
   },
   plugins: [
     react(),

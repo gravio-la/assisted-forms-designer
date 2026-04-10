@@ -4,12 +4,21 @@ import { ToolProvider } from '@formswizard/tool-context'
 import { I18nProvider } from '@formswizard/i18n'
 import { basicToolsCollection } from '@formswizard/basic-tools'
 import { advancedToolsCollection } from '@formswizard/advanced-tools'
+import { toplevelLayoutCollection } from '@formswizard/toplevel-layout'
+import { uploadToolsCollection } from '@formswizard/upload-tools'
 import { MarkdownChatProvider } from '@graviola/agent-chat-markdown'
 import { AgentAssistant } from './AgentAssistant'
 
 const App = () => (
   <I18nProvider>
-    <ToolProvider toolCollections={[basicToolsCollection, advancedToolsCollection]}>
+    <ToolProvider
+      toolCollections={[
+        basicToolsCollection,
+        advancedToolsCollection,
+        toplevelLayoutCollection,
+        uploadToolsCollection,
+      ]}
+    >
       <WizardProvider>
         <MarkdownChatProvider>
           <MainLayout multipleDefinitions={false} />
