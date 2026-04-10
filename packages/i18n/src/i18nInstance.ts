@@ -92,6 +92,10 @@ const FORMSDESIGNER_BASE_TRANSLATIONS: Resource = {
       'fieldSettings.renameCancel': 'Cancel',
       // --- Drop zones (designer canvas) ---
       'dropZone.placeholder': 'Placeholder',
+      // --- AI assistant (vite wizard) ---
+      'aiAssistant.welcome':
+        'Welcome! I’m your form assistant — I can add fields, layouts, and refinements. Describe what you need in your own words and I’ll help you build it.',
+      'aiAssistant.openFabAriaLabel': 'Open form assistant',
     },
   },
   de: {
@@ -151,6 +155,10 @@ const FORMSDESIGNER_BASE_TRANSLATIONS: Resource = {
       'fieldSettings.renameCancel': 'Abbrechen',
       // --- Drop zones (designer canvas) ---
       'dropZone.placeholder': 'Platzhalter',
+      // --- AI assistant (vite wizard) ---
+      'aiAssistant.welcome':
+        'Willkommen! Ich bin dein Formular-Assistent — ich kann Felder, Layouts und Feinheiten für dich einrichten. Beschreib einfach, was du brauchst, dann setze ich das für dich um.',
+      'aiAssistant.openFabAriaLabel': 'Formular-Assistent öffnen',
     },
   },
 }

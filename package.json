@@ -84,5 +84,8 @@
     "@jsonforms/core": "^3.7.0",
     "@jsonforms/react": "^3.7.0",
     "@jsonforms/material-renderers": "^3.7.0"
+  },
+  "dependencies": {
+    "@graviola/agent-chat-flow": "^0.1.5"
   }
 }

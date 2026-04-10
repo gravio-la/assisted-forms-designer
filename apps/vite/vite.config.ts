@@ -6,9 +6,13 @@ import { visualizer } from 'rollup-plugin-visualizer'
 export default defineConfig({
   // Wrap with slashes so Vite gets the correct sub-path for GitHub Pages.
   base: process.env.VITE_BASE_PATH ? `/${process.env.VITE_BASE_PATH}/` : '/',
-  /** Workspace packages can pull a second copy of React; react-i18next then sees null hooks. */
+  /**
+   * - React / react-i18next: workspace packages can pull a second copy; hooks break.
+   * - @graviola/agent-chat-components: flow@0.1.3 may nest components@0.1.0 without WandHutFabIcon;
+   *   force a single hoisted 0.1.1 (see root package.json overrides).
+   */
   resolve: {
-    dedupe: ['react', 'react-dom'],
+    dedupe: ['react', 'react-dom', '@graviola/agent-chat-components'],
   },
   optimizeDeps: {
     include: [

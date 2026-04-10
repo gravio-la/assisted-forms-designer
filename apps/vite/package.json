@@ -25,8 +25,9 @@
     "@formswizard/tool-context": "workspace:*",
     "@formswizard/toplevel-layout": "workspace:*",
     "@formswizard/upload-tools": "workspace:*",
-    "@graviola/agent-chat-flow": "latest",
-    "@graviola/agent-chat-markdown": "latest",
+    "@graviola/agent-chat-components": "^0.1.1",
+    "@graviola/agent-chat-flow": "^0.1.5",
+    "@graviola/agent-chat-markdown": "^0.1.2",
     "@jsonforms/material-renderers": "catalog:",
     "@jsonforms/react": "catalog:",
     "@mui/icons-material": "catalog:",
@@ -39,6 +40,7 @@
     "lodash-es": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-i18next": "^15.7.3",
     "react-redux": "^9.2.0"
   },
   "devDependencies": {

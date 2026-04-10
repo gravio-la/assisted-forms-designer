@@ -1,4 +1,6 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useDesignerTranslation } from '@formswizard/i18n'
 import {
   useAppDispatch,
   useAppSelector,
@@ -16,27 +18,35 @@ import {
 } from '@formswizard/state'
 import { AiAssistantProvider, useAiAssistantChat } from '@graviola/agent-chat-flow'
 import type { ToolResult } from '@graviola/agent-chat-flow'
+import { WandHutFabIcon } from '@graviola/agent-chat-components'
+import { AGENT_SESSION_CUSTOM_RENDERERS } from './agentSessionCustomRenderers'
 import Fab from '@mui/material/Fab'
 import CircularProgress from '@mui/material/CircularProgress'
-import ChatBubbleOutlineOutlined from '@mui/icons-material/ChatBubbleOutlineOutlined'
 
 const SERVER_URL = import.meta.env.VITE_AGENT_SERVER_URL ?? 'http://localhost:3001'
 
 function AssistantFABTrigger() {
+  const { t } = useDesignerTranslation()
   const { openChat, isCreating, hasSession } = useAiAssistantChat()
   if (hasSession) return null
   return (
     <Fab
       color="primary"
-      aria-label="Open AI assistant"
+      aria-label={t('aiAssistant.openFabAriaLabel')}
       onClick={() => void openChat()}
       disabled={isCreating}
-      sx={{ position: 'fixed', right: 24, bottom: 24, zIndex: 1300 }}
+      sx={{
+        position: 'fixed',
+        right: 24,
+        bottom: 24,
+        zIndex: 1300,
+        '& svg': { fontSize: 28 },
+      }}
     >
       {isCreating ? (
         <CircularProgress size={24} color="inherit" />
       ) : (
-        <ChatBubbleOutlineOutlined />
+        <WandHutFabIcon />
       )}
     </Fab>
   )
@@ -49,6 +59,14 @@ function AssistantFABTrigger() {
  * the system prompt from the current live state.
  */
 export function AgentAssistant() {
+  const { i18n } = useTranslation()
+  const { t } = useDesignerTranslation()
+  const sessionLanguage = useMemo((): 'de' | 'en' => (i18n.language.startsWith('de') ? 'de' : 'en'), [
+    i18n.language,
+  ])
+
+  const welcomeMessage = t('aiAssistant.welcome')
+
   const dispatch = useAppDispatch()
   const jsonSchema = useAppSelector(selectJsonSchema)
   const uiSchema = useAppSelector(selectUiSchema)
@@ -103,6 +121,9 @@ export function AgentAssistant() {
   return (
     <AiAssistantProvider
       serverUrl={SERVER_URL}
+      language={sessionLanguage}
+      welcomeMessage={welcomeMessage}
+      customRenderers={AGENT_SESSION_CUSTOM_RENDERERS}
       schema={{ jsonSchema, uiSchema }}
       onExecuteTool={handleExecuteTool}
       {...(agentSelectedElement !== undefined ? { selectedElement: agentSelectedElement } : {})}
