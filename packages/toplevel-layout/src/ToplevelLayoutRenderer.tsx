@@ -18,7 +18,7 @@ import {
   Typography,
   createTheme,
 } from '@mui/material'
-import type { ComponentType, MouseEvent } from 'react'
+import type { ComponentType, MouseEvent, ReactNode } from 'react'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useJsonForms } from '@jsonforms/react'
 import { i18nInstance } from '@formswizard/i18n'
@@ -58,7 +58,7 @@ export type TopLevelLayoutUISchema = Layout & {
   }
 }
 
-function mergeLayoutOptions(
+export function mergeLayoutOptions(
   config: Record<string, unknown> | undefined,
   uischema: TopLevelLayoutUISchema
 ): NonNullable<TopLevelLayoutUISchema['options']> {
@@ -98,7 +98,7 @@ function useDefaultTopLevelHeadline(headline: string | undefined): string {
 }
 
 /** Pushes a non-default TopLevel preset to Redux for the main column shell tint; clears when using parent theme. */
-function TopLevelShellThemeSync({ colorThemeId }: { colorThemeId: string }) {
+export function TopLevelShellThemeSync({ colorThemeId }: { colorThemeId: string }) {
   const dispatch = useAppDispatch()
   useEffect(() => {
     dispatch(
@@ -108,13 +108,18 @@ function TopLevelShellThemeSync({ colorThemeId }: { colorThemeId: string }) {
   return null
 }
 
-type ToplevelLayoutViewProps = LayoutProps & {
+export type TopLevelLayoutControlProps = LayoutProps & {
   /** When set (designer shell), the card selects the layout for tool settings — same idea as MaterialEditableGroupLayout */
   onCardClick?: (event: MouseEvent) => void
   isSelected?: boolean
+  /**
+   * When set (e.g. edit-mode drop zone), replaces the default `elements` → `JsonFormsDispatch` stack.
+   */
+  renderBody?: () => ReactNode
 }
 
-function ToplevelLayoutView({
+/** Presentational shell: themed card, headline, optional hero image, and body area. */
+export function TopLevelLayoutControl({
   uischema,
   schema,
   path,
@@ -124,7 +129,8 @@ function ToplevelLayoutView({
   config,
   onCardClick,
   isSelected,
-}: ToplevelLayoutViewProps) {
+  renderBody,
+}: TopLevelLayoutControlProps) {
   const layout = uischema as TopLevelLayoutUISchema
   const options = mergeLayoutOptions(config as Record<string, unknown> | undefined, layout)
   const {
@@ -147,7 +153,7 @@ function ToplevelLayoutView({
       ? Math.max(0, Math.min(24, Math.round(cardElevationOption)))
       : 6
 
-  if (!visible) {
+  if (visible === false) {
     return null
   }
 
@@ -232,17 +238,21 @@ function ToplevelLayoutView({
               pointerEvents: 'auto',
             }}
           >
-            {elements.map((el, index) => (
-              <Box key={index} sx={{ mb: index < elements.length - 1 ? 2 : 0 }}>
-                <JsonFormsDispatch
-                  schema={schema}
-                  uischema={el}
-                  path={path}
-                  renderers={renderers}
-                  cells={cells}
-                />
-              </Box>
-            ))}
+            {renderBody ? (
+              renderBody()
+            ) : (
+              elements.map((el, index) => (
+                <Box key={index} sx={{ mb: index < elements.length - 1 ? 2 : 0 }}>
+                  <JsonFormsDispatch
+                    schema={schema}
+                    uischema={el}
+                    path={path}
+                    renderers={renderers}
+                    cells={cells}
+                  />
+                </Box>
+              ))
+            )}
           </CardContent>
         </Card>
       </Container>
@@ -260,11 +270,12 @@ function ToplevelLayoutView({
  * Designer: dispatch selection when the shell has a path (from extendUiSchemaWithPath).
  * Standalone Storybook / tests: no Redux → presentational only.
  */
-function ToplevelLayoutDesignerChrome(props: LayoutProps) {
+export function TopLevelLayoutDesignerChrome(props: LayoutProps & { renderBody?: () => ReactNode }) {
   const dispatch = useAppDispatch()
   const selectedPath = useAppSelector(selectSelectedPath)
   const layout = props.uischema as TopLevelLayoutUISchema & { path?: string }
   const layoutPath = layout.path
+  const { renderBody } = props
 
   const handleSelect = useCallback(
     (event: MouseEvent) => {
@@ -279,15 +290,21 @@ function ToplevelLayoutDesignerChrome(props: LayoutProps) {
   const isSelected = layoutPath != null && selectedPath === layoutPath
 
   return (
-    <ToplevelLayoutView
+    <TopLevelLayoutControl
       {...props}
       onCardClick={handleSelect}
       isSelected={isSelected}
+      renderBody={renderBody}
     />
   )
 }
 
-function ToplevelLayoutRendererInner(props: LayoutProps) {
+/**
+ * Shared root for default TopLevel renderer and edit-mode variants (e.g. drop zone): syncs shell
+ * theme when a Redux store is present, and picks designer chrome vs plain shell so Storybook/tests
+ * without a Provider do not call `useAppDispatch`.
+ */
+export function TopLevelLayoutRendererShell(props: LayoutProps & { renderBody?: () => ReactNode }) {
   const redux = useContext(ReactReduxContext)
   const layout = props.uischema as TopLevelLayoutUISchema & { path?: string }
   const hasDesignerPath = layout.path != null
@@ -299,9 +316,9 @@ function ToplevelLayoutRendererInner(props: LayoutProps) {
 
   const body =
     redux?.store && hasDesignerPath ? (
-      <ToplevelLayoutDesignerChrome {...props} />
+      <TopLevelLayoutDesignerChrome {...props} />
     ) : (
-      <ToplevelLayoutView {...props} />
+      <TopLevelLayoutControl {...props} />
     )
 
   return (
@@ -310,6 +327,10 @@ function ToplevelLayoutRendererInner(props: LayoutProps) {
       {body}
     </>
   )
+}
+
+function ToplevelLayoutRendererInner(props: LayoutProps) {
+  return <TopLevelLayoutRendererShell {...props} />
 }
 
 const ToplevelLayoutRendererWithProps = withJsonFormsLayoutProps(

@@ -6,6 +6,12 @@ export {
   type ColorThemeId,
 } from './colorThemes'
 export {
+  mergeLayoutOptions,
+  TopLevelLayoutControl,
+  type TopLevelLayoutControlProps,
+  TopLevelLayoutDesignerChrome,
+  TopLevelLayoutRendererShell,
+  TopLevelShellThemeSync,
   ToplevelLayoutRenderer,
   toplevelLayoutRendererEntry,
   toplevelLayoutTester,

@@ -1,3 +1,7 @@
+import {
+  TopLevelLayoutWithDropZoneRenderer,
+  topLevelLayoutWithDropZoneTester,
+} from './TopLevelLayoutWithDropZoneRenderer'
 import { verticalLayoutTester, VerticalLayoutWithDropZoneRenderer } from './VerticalLayoutWithDropZoneRenderer'
 import { horizontalLayoutTester, HorizontalLayoutWithDropZoneRenderer } from './HorizontalLayoutWithDropZoneRenderer'
 import { materialEditableGroupTester, MaterialEditableGroupLayoutRenderer } from './MaterialEditableGroupLayout'
@@ -8,6 +12,7 @@ import {
 } from './MaterialEditableCategorizationLayout'
 
 export * from './HorizontalLayoutWithDropZoneRenderer'
+export * from './TopLevelLayoutWithDropZoneRenderer'
 export * from './VerticalLayoutWithDropZoneRenderer'
 export * from './MaterialEditableCategorizationLayout'
 
@@ -19,6 +24,10 @@ export const previewRenderer = [
 ]
 
 export const dropRenderer = [
+  {
+    tester: topLevelLayoutWithDropZoneTester,
+    renderer: TopLevelLayoutWithDropZoneRenderer,
+  },
   {
     tester: verticalLayoutTester,
     renderer: VerticalLayoutWithDropZoneRenderer,

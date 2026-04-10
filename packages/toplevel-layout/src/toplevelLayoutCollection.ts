@@ -11,6 +11,9 @@ import { translations } from './translations'
 const dataUrlFormat: Format = (data: string) =>
   typeof data === 'string' && data.length > 0 && data.startsWith('data:')
 
+/** Matches `format: font-family` on fontFamily (font id from AvailableFontsProvider, or `default`). */
+const fontFamilyFormat: Format = (data: unknown) => typeof data === 'string'
+
 export const toplevelLayoutCollection: FormsDesignerToolCollection = {
   info: {
     name: 'toplevel-layout',
@@ -23,6 +26,7 @@ export const toplevelLayoutCollection: FormsDesignerToolCollection = {
   toolSettings: [ToplevelLayoutToolSettings],
   ajvFormatRegistry: {
     'data-url': dataUrlFormat,
+    'font-family': fontFamilyFormat,
   },
   translations,
 }

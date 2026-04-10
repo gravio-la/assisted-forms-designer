@@ -99,11 +99,16 @@ const LayoutElement = ({ index, schema, path, enabled, element: child, cells, re
     () => (child.type === 'Control' ? composeWithUi(child as ControlElement, path) : undefined),
     [child, path]
   )
-  const resolvedSchema = useMemo<JsonSchema | undefined>(
-    () => Resolve.schema(schema || rootSchema, (child as ControlElement).scope, rootSchema),
-
-    [schema, rootSchema, child]
-  )
+  const resolvedSchema = useMemo<JsonSchema | undefined>(() => {
+    if (child.type !== 'Control') {
+      return undefined
+    }
+    const scope = (child as ControlElement).scope
+    if (!scope) {
+      return undefined
+    }
+    return Resolve.schema(schema || rootSchema, scope, rootSchema)
+  }, [schema, rootSchema, child])
   const key = useMemo<string>(
     () => (controlName ? controlName : `${child.type}-${index}`),
     [controlName, index, child.type]
