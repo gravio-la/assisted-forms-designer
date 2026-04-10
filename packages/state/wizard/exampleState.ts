@@ -1,4 +1,5 @@
 import { JsonSchema } from '@formswizard/types'
+import { DEFAULT_ROOT_UI_SCHEMA } from './defaultRootUiSchema'
 export type JsonFormsEditState = {
   jsonSchema: JsonSchema
   definitions: Record<string, JsonSchema>
@@ -18,7 +19,7 @@ export const exampleInitialState: JsonFormsEditState = {
     type: 'object',
     properties: {}
   },
-  uiSchema: { type: 'VerticalLayout', elements: []},
+  uiSchema: DEFAULT_ROOT_UI_SCHEMA,
   definitions: {},
   uiSchemas: {},
   selectedDefinition: 'Root',

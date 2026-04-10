@@ -28,6 +28,7 @@ import {
   JsonSchema,
   UISchemaElementWithPath,
 } from '@formswizard/types'
+import { DEFAULT_ROOT_UI_SCHEMA } from './defaultRootUiSchema'
 import { exampleInitialState, JsonFormsEditState } from './exampleState'
 import jsonpointer from 'jsonpointer'
 export const isDraggableComponent = (element: any): element is DraggableComponent =>
@@ -377,7 +378,7 @@ export const jsonFormsEditSlice = createSlice({
       state.selectedPath = undefined
 
       state.selectedDefinition = definition
-      state.uiSchema = state.uiSchemas[definition] || { type: 'VerticalLayout', elements: [] }
+      state.uiSchema = state.uiSchemas[definition] || DEFAULT_ROOT_UI_SCHEMA
       state.jsonSchema = state.definitions[definition] || { type: 'object', properties: {} }
     },
     /**
@@ -675,7 +676,15 @@ export const jsonFormsEditSlice = createSlice({
         if (state.uiSchema && isLayout(state.uiSchema as any)) {
           ;(state.uiSchema as any as Layout).elements.push(newLayout)
         } else {
-          state.uiSchema = { type: 'VerticalLayout', elements: [newLayout] } as any
+          state.uiSchema = {
+            ...DEFAULT_ROOT_UI_SCHEMA,
+            elements: [
+              {
+                type: 'VerticalLayout',
+                elements: [newLayout],
+              },
+            ],
+          } as any
         }
       }
 

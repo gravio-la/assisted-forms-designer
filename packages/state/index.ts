@@ -1,5 +1,6 @@
 export * from './store'
 export * from './hooks'
+export * from './wizard/defaultRootUiSchema'
 export * from './wizard/jsonFormsEditSlice'
 export * from './wizard/jsonFormsEditPersistence'
 export * from './appBar/appBarSlice'
