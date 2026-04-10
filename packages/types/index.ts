@@ -117,6 +117,8 @@ export type CollectionTranslations = {
 export type ToolContextState<T extends JsonSchema = JsonSchema> = {
   iconRegistry: ToolIconRegistry
   rendererRegistry: JsonFormsRendererRegistryEntry[]
+  /** Extra JsonForms renderers merged after materialRenderers in the field settings panel only */
+  settingsRendererRegistry: JsonFormsRendererRegistryEntry[]
   cellRendererRegistry: JsonFormsCellRendererRegistryEntry[]
   ajvFormatRegistry: AjvFormatRegistry
   toolSettings: ToolSettings<T>
