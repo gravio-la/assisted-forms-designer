@@ -1,4 +1,4 @@
-import { generateDefaultUISchema, UISchemaElement } from '@jsonforms/core'
+import { generateDefaultUISchema, JsonSchema7, UISchemaElement } from '@jsonforms/core'
 import { JsonSchema, ScopeOverrides } from '@formswizard/types'
 import { deepMap } from './deepMap'
 
@@ -28,6 +28,6 @@ export const generateDefaultUISchemaWithScopeOverrides = (schema: JsonSchema, sc
     }
     return undefined
   }
-  const defaultUISchema = generateDefaultUISchema(schema)
+  const defaultUISchema = generateDefaultUISchema(schema as JsonSchema7)
   return deepMap(defaultUISchema, matchScopeAndReplace)
 }
