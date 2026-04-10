@@ -1,0 +1,67 @@
+{
+  "name": "@formswizard/upload-tools",
+  "version": "0.0.1",
+  "description": "Upload controls for forms (image blob, and future server-backed upload tools)",
+  "license": "MIT",
+  "homepage": "https://github.com/FormsWizard",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormsWizard/forms-designer.git"
+  },
+  "contributors": [],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "scripts": {
+    "depcheck": "depcheck",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "bun test src",
+    "lint": "eslint src/**/*.{ts,tsx}",
+    "lint-fix": "eslint --fix src/**/*.{ts,tsx}",
+    "push": "bun publish --access public"
+  },
+  "peerDependencies": {
+    "@jsonforms/core": "catalog:",
+    "@jsonforms/material-renderers": "catalog:",
+    "@jsonforms/react": "catalog:",
+    "@mui/icons-material": "catalog:",
+    "@mui/material": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "react": "catalog:"
+  },
+  "dependencies": {
+    "@formswizard/fieldsettings": "workspace:*",
+    "@formswizard/i18n": "workspace:*",
+    "@formswizard/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@formswizard/designer-tsconfig": "workspace:*",
+    "@formswizard/tsup-config": "workspace:*",
+    "eslint-config-formsdesigner": "workspace:*",
+    "tsup": "^8.0.0",
+    "typescript": "^4.5.2"
+  },
+  "clean-package": {
+    "extends": "../../../clean-package.config.cjs"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": ["eslint-config-formsdesigner"]
+  }
+}
