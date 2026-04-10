@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -32,7 +32,7 @@ import {
 import { useFinalizedToolSettings } from '@formswizard/fieldsettings'
 import { useDesignerTranslation } from '@formswizard/i18n'
 import { i18nInstance } from '@formswizard/i18n'
-import { useTheme } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 import { PreviewModeToggle } from './MainAppBar'
 import { ExportSchemaModal, ImportSchemaModal } from '../components'
 
@@ -58,9 +58,18 @@ export function MobileAppBar({
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
   const [exportModalOpen, setExportModalOpen] = useState(false)
   const [importModalOpen, setImportModalOpen] = useState(false)
+  /** Bumps when selection changes so the settings button attention animation restarts. */
+  const [settingsAttentionKey, setSettingsAttentionKey] = useState(0)
 
   const showLeftDrawerToggle = !previewModus
-  const showRightDrawerToggle = Boolean(selectedPath) && !previewModus
+  /** Root layout uses `path: ''` from extendUiSchemaWithPath — must not use Boolean(path) (falsy for ''). */
+  const showRightDrawerToggle = selectedPath != null && !previewModus
+
+  useEffect(() => {
+    if (selectedPath != null && !previewModus) {
+      setSettingsAttentionKey((k) => k + 1)
+    }
+  }, [selectedPath, previewModus])
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setMenuAnchor(event.currentTarget)
@@ -115,13 +124,45 @@ export function MobileAppBar({
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 48, justifyContent: 'flex-end' }}>
             {showRightDrawerToggle && (
-              <IconButton
-                color="inherit"
-                aria-label={t('appBar.settings')}
-                onClick={onToggleRightDrawer}
+              <Box
+                key={settingsAttentionKey}
+                sx={(theme) => ({
+                  display: 'inline-flex',
+                  borderRadius: '50%',
+                  '@keyframes mobileSettingsAttention': {
+                    '0%': {
+                      transform: 'scale(1)',
+                      boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0.55)}`,
+                    },
+                    '32%': {
+                      transform: 'scale(1.14)',
+                      boxShadow: `0 0 0 14px ${alpha(theme.palette.primary.main, 0)}`,
+                    },
+                    '58%': {
+                      transform: 'scale(1)',
+                      boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0)}`,
+                    },
+                    '76%': {
+                      transform: 'scale(1.08)',
+                    },
+                    '100%': {
+                      transform: 'scale(1)',
+                    },
+                  },
+                  animation: 'mobileSettingsAttention 2.1s ease-out 1',
+                  '@media (prefers-reduced-motion: reduce)': {
+                    animation: 'none',
+                  },
+                })}
               >
-                <SettingsIcon />
-              </IconButton>
+                <IconButton
+                  color="inherit"
+                  aria-label={t('appBar.settings')}
+                  onClick={onToggleRightDrawer}
+                >
+                  <SettingsIcon />
+                </IconButton>
+              </Box>
             )}
             <IconButton
               color="inherit"
