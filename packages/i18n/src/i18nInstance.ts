@@ -90,6 +90,8 @@ const FORMSDESIGNER_BASE_TRANSLATIONS: Resource = {
       'fieldSettings.renameTitle': 'Rename field',
       'fieldSettings.renameConfirm': 'Rename',
       'fieldSettings.renameCancel': 'Cancel',
+      // --- Drop zones (designer canvas) ---
+      'dropZone.placeholder': 'Placeholder',
     },
   },
   de: {
@@ -147,6 +149,8 @@ const FORMSDESIGNER_BASE_TRANSLATIONS: Resource = {
       'fieldSettings.renameTitle': 'Feld umbenennen',
       'fieldSettings.renameConfirm': 'Umbenennen',
       'fieldSettings.renameCancel': 'Abbrechen',
+      // --- Drop zones (designer canvas) ---
+      'dropZone.placeholder': 'Platzhalter',
     },
   },
 }

@@ -64,6 +64,7 @@
     "@types/react-dom": "catalog:"
   },
   "dependencies": {
+    "@formswizard/i18n": "workspace:*",
     "@formswizard/react-hooks": "workspace:*",
     "@formswizard/state": "workspace:*",
     "@formswizard/utils": "workspace:*",

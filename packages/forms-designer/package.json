@@ -61,6 +61,8 @@
     "@formswizard/react-hooks": "workspace:*",
     "@formswizard/state": "workspace:*",
     "@formswizard/theme": "workspace:*",
+    "@formswizard/toplevel-layout": "workspace:*",
+    "@formswizard/upload-tools": "workspace:*",
     "@formswizard/tool-context": "workspace:*",
     "@formswizard/toolbox": "workspace:*",
     "@formswizard/utils": "workspace:*",

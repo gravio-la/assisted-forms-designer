@@ -1,6 +1,7 @@
 import type { OwnPropsOfRenderer, UISchemaElement } from '@jsonforms/core'
 import { useId } from 'react'
 import { Box } from '@mui/material'
+import { useDesignerTranslation } from '@formswizard/i18n'
 import { DropTargetFormsPreview } from './DropTargetFormsPreview'
 import { useDNDHooksContext, useDropTarget, useActiveDrag } from '@formswizard/react-hooks'
 
@@ -17,6 +18,7 @@ type StyledPlaceholderProps = {
   onDrop: (data: any) => void
 }
 const StyledPlaceholderElementBox = ({ onDrop }: StyledPlaceholderProps) => {
+  const { t } = useDesignerTranslation()
   const { useDroppable } = useDNDHooksContext()
   const uid = useId()
   const activeDrag = useActiveDrag()
@@ -45,7 +47,7 @@ const StyledPlaceholderElementBox = ({ onDrop }: StyledPlaceholderProps) => {
         // @ts-ignore
         <DropTargetFormsPreview metadata={activeDrag.componentMeta} />
       ) : (
-        <span style={{ margin: 'auto' }}> Placeholder</span>
+        <span style={{ margin: 'auto' }}>{t('dropZone.placeholder')}</span>
       )}
     </Box>
   )

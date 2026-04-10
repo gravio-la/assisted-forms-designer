@@ -1,7 +1,7 @@
 'use client'
 
 import type { FunctionComponent, ReactNode } from 'react'
-import { useRef, useState, useEffect } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import { Box, Button, ButtonBase, Container, Drawer, Paper, Tab, Tabs, Toolbar, useTheme, useMediaQuery } from '@mui/material'
 import { Wizard, WizardProps } from './Wizard'
 import { Toolbox } from '@formswizard/toolbox'
@@ -11,7 +11,21 @@ import { MobileAppBar } from './layout/MobileAppBar'
 import { TrashFAB } from './components'
 import { EditableTab } from './components/EditableTab'
 import { AddDefinitionButton } from './components/AddDefinitionButton'
-import { selectCurrentDefinition, selectJsonSchemaDefinitions, selectPath, selectPreviewModus, switchDefinition, togglePreviewModus, useAppDispatch, useAppSelector, renameSchemaDefinition } from '@formswizard/state'
+import {
+  selectCurrentDefinition,
+  selectJsonSchemaDefinitions,
+  selectPath,
+  selectPreviewModus,
+  selectTopLevelShellColorThemeId,
+  selectUiSchema,
+  setTopLevelShellColorTheme,
+  switchDefinition,
+  togglePreviewModus,
+  useAppDispatch,
+  useAppSelector,
+  renameSchemaDefinition,
+} from '@formswizard/state'
+import { getTopLevelShellBackgroundDefaultHex } from '@formswizard/toplevel-layout'
 import Close from '@mui/icons-material/Close'
 import { useDNDHooksContext } from '@formswizard/react-hooks'
 import useAutoDeselectOnOutsideClick from './useAutoDeselectOnOutsideClick'
@@ -79,6 +93,26 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
   const { handleClickOutside } = useAutoDeselectOnOutsideClick(wizardPaperRef)
   const definitions = useAppSelector(selectJsonSchemaDefinitions)
   const currentDefinition = useAppSelector(selectCurrentDefinition)
+  const rootUiSchema = useAppSelector(selectUiSchema)
+  const rootIsTopLevel =
+    rootUiSchema != null && typeof rootUiSchema === 'object' && (rootUiSchema as { type?: string }).type === 'TopLevelLayout'
+
+  useEffect(() => {
+    if (!rootIsTopLevel) {
+      dispatch(setTopLevelShellColorTheme(null))
+    }
+  }, [rootIsTopLevel, dispatch])
+
+  const topLevelShellThemeId = useAppSelector(selectTopLevelShellColorThemeId)
+  const wizardColumnBg = useMemo(
+    () => getTopLevelShellBackgroundDefaultHex(topLevelShellThemeId),
+    [topLevelShellThemeId]
+  )
+  /** Same fill behind the flex row: persistent drawer dock roots stay wide when closed (preview) and are transparent. */
+  const shellRowBgSx = {
+    bgcolor: (t: typeof theme) => wizardColumnBg ?? t.palette.background.default,
+  } as const
+
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     dispatch(switchDefinition({ definition: newValue }))
   }
@@ -128,7 +162,7 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
           </Button>
         )}
         {isMobile ? (
-          <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
+          <Box sx={{ display: 'flex', flex: 1, minHeight: 0, ...shellRowBgSx }}>
             <Drawer
               variant="temporary"
               anchor="left"
@@ -148,7 +182,16 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
               <Toolbar />
               <Toolbox />
             </Drawer>
-            <Container maxWidth={false} ref={wizardPaperRef} sx={{ px: 0 }}>
+            <Container
+              maxWidth={false}
+              ref={wizardPaperRef}
+              sx={{
+                px: 0,
+                flex: 1,
+                minWidth: 0,
+                ...shellRowBgSx,
+              }}
+            >
               <Toolbar />
               <Box display="flex" flexDirection="row" alignItems='center'>
                 {multipleDefinitions && <>
@@ -175,7 +218,15 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
                   <AddDefinitionButton createNewDefinition={createNewDefinition} />
                 </>}
               </Box>
-              <Paper elevation={0} square sx={{ p: 1, m: 0, width: '100%' }}>
+              <Paper
+                elevation={0}
+                square
+                sx={
+                  rootIsTopLevel
+                    ? { p: 0, m: 0, width: '100%', bgcolor: 'transparent', boxShadow: 'none' }
+                    : { p: 1, m: 0, width: '100%' }
+                }
+              >
                 <Wizard {...wizardProps} />
               </Paper>
             </Container>
@@ -218,11 +269,23 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
               >
                 <Close sx={{ fontSize: 16 }} />
               </ButtonBase>
-              <FieldSettingsView />
+              <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+                <Box sx={{ overflow: 'auto', flex: 1 }}>
+                  <FieldSettingsView />
+                </Box>
+              </Box>
             </Drawer>
           </Box>
         ) : (
-          <>
+          <Box
+            sx={{
+              display: 'flex',
+              flex: 1,
+              minWidth: 0,
+              alignSelf: 'stretch',
+              ...shellRowBgSx,
+            }}
+          >
             <Drawer
               variant="persistent"
               anchor="left"
@@ -239,7 +302,15 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
               <Toolbar />
               <Toolbox />
             </Drawer>
-            <Container maxWidth={false} ref={wizardPaperRef}>
+            <Container
+              maxWidth={false}
+              ref={wizardPaperRef}
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                ...shellRowBgSx,
+              }}
+            >
               <Toolbar />
               <Box display="flex" flexDirection="row" alignItems='center'>
                 {multipleDefinitions && <>
@@ -266,7 +337,15 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
                   <AddDefinitionButton createNewDefinition={createNewDefinition} />
                 </>}
               </Box>
-              <Paper elevation={12} square sx={{ p: 2, m: 4 }}>
+              <Paper
+                elevation={rootIsTopLevel ? 0 : 12}
+                square
+                sx={
+                  rootIsTopLevel
+                    ? { p: 0, m: 0, bgcolor: 'transparent', boxShadow: 'none' }
+                    : { p: 2, m: 4 }
+                }
+              >
                 <Wizard {...wizardProps} />
               </Paper>
             </Container>
@@ -307,10 +386,14 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
               >
                 <Close sx={{ fontSize: 16 }} />
               </ButtonBase>
-              <Toolbar />
-              <FieldSettingsView />
+              <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+                <Toolbar sx={{ flexShrink: 0 }} />
+                <Box sx={{ overflow: 'auto', flex: 1 }}>
+                  <FieldSettingsView />
+                </Box>
+              </Box>
             </Drawer>
-          </>
+          </Box>
         )}
       </Box>
       <TrashFAB />
