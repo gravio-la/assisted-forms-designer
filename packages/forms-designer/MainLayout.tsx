@@ -26,6 +26,7 @@ import {
   renameSchemaDefinition,
 } from '@formswizard/state'
 import { getTopLevelShellBackgroundDefaultHex } from '@formswizard/toplevel-layout'
+import { CondensedThemeWrapper } from '@formswizard/condensed-theme'
 import Close from '@mui/icons-material/Close'
 import { useDNDHooksContext } from '@formswizard/react-hooks'
 import useAutoDeselectOnOutsideClick from './useAutoDeselectOnOutsideClick'
@@ -271,7 +272,9 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
               </ButtonBase>
               <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
                 <Box sx={{ overflow: 'auto', flex: 1 }}>
-                  <FieldSettingsView />
+                  <CondensedThemeWrapper>
+                    <FieldSettingsView />
+                  </CondensedThemeWrapper>
                 </Box>
               </Box>
             </Drawer>
@@ -389,7 +392,9 @@ export const MainLayout: FunctionComponent<Props> = ({ appBar, multipleDefinitio
               <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
                 <Toolbar sx={{ flexShrink: 0 }} />
                 <Box sx={{ overflow: 'auto', flex: 1 }}>
-                  <FieldSettingsView />
+                  <CondensedThemeWrapper>
+                    <FieldSettingsView />
+                  </CondensedThemeWrapper>
                 </Box>
               </Box>
             </Drawer>

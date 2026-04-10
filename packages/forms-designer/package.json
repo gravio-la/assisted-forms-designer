@@ -60,6 +60,7 @@
     "@formswizard/fieldsettings": "workspace:*",
     "@formswizard/react-hooks": "workspace:*",
     "@formswizard/state": "workspace:*",
+    "@formswizard/condensed-theme": "workspace:*",
     "@formswizard/theme": "workspace:*",
     "@formswizard/toplevel-layout": "workspace:*",
     "@formswizard/upload-tools": "workspace:*",
