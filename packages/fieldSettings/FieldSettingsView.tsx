@@ -1,16 +1,22 @@
 import { materialCells, materialRenderers } from '@jsonforms/material-renderers'
 import { JsonForms } from '@jsonforms/react'
 import type { JsonSchema as JsonFormsJsonSchema } from '@jsonforms/core'
+import { useMemo } from 'react'
 import { useFinalizedToolSettings } from './useFieldSettings'
 import { Box, Divider, Grid } from '@mui/material'
-import { useToolContext } from '@formswizard/tool-context'
+import { useToolContext, useToolSettingsAjv } from '@formswizard/tool-context'
 import { useJsonFormsI18n } from '@formswizard/i18n'
 import EditableFieldKeyDisplay from './EditableFieldKeyDisplay'
 
 export function FieldSettingsView() {
   const { handleChange, toolSettingsJsonSchema, tooldataBuffer, uiSchema } = useFinalizedToolSettings()
-  const { registeredCollections } = useToolContext()
+  const { registeredCollections, settingsRendererRegistry } = useToolContext()
+  const renderers = useMemo(
+    () => [...materialRenderers, ...(settingsRendererRegistry ?? [])],
+    [settingsRendererRegistry]
+  )
   const i18n = useJsonFormsI18n(registeredCollections)
+  const ajv = useToolSettingsAjv()
 
   return (
     <>
@@ -26,10 +32,11 @@ export function FieldSettingsView() {
                 data={tooldataBuffer}
                 schema={toolSettingsJsonSchema as JsonFormsJsonSchema}
                 uischema={uiSchema || undefined}
-                renderers={materialRenderers}
+                renderers={renderers}
                 cells={materialCells}
                 onChange={handleChange}
                 i18n={i18n}
+                ajv={ajv}
               />
             )}
           </Box>
