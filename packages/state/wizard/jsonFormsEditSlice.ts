@@ -4,6 +4,7 @@ import { RootState } from '../store'
 import {
   deeplySetNestedProperty,
   deeplyUpdateNestedSchema,
+  findItemPropertiesScopeForDropTarget,
   pathSegmentsToJSONPointer,
   pathSegmentsToPath,
   pathSegmentsToScope,
@@ -11,14 +12,18 @@ import {
   recursivelyMapSchema,
   removeUISchemaElement,
   scopeToPathSegments,
+  scopeToJsonSchemaPath,
+  resolveAbsoluteScope,
   updateScopeOfUISchemaElement,
   updateUISchemaElement,
   deeplyRemoveNestedProperty,
+  deeplyRemoveAtJsonSchemaPath,
   deeplyRenameNestedProperty,
   deeplyUpdateReference,
   resolveScopeWithoutRef,
   resolveSchema,
-  getAllScopesInSchema
+  getAllScopesInSchema,
+  collectControlScopesInSubtree,
 } from '@formswizard/utils'
 
 import {
@@ -163,7 +168,11 @@ const getUiSchemaWithScope: (
 const traverseUISchema = (uiSchema: UISchemaElement, callback: (uiSchema: UISchemaElement) => void) => {
   callback(uiSchema)
   if (isLayout(uiSchema) && uiSchema.elements) {
-    uiSchema.elements.forEach(element => traverseUISchema(element, callback))
+    uiSchema.elements.forEach((element) => traverseUISchema(element, callback))
+  }
+  const detail = (uiSchema as UISchemaElement & { options?: { detail?: UISchemaElement } }).options?.detail
+  if (detail && isLayout(detail) && detail.elements) {
+    detail.elements.forEach((element) => traverseUISchema(element, callback))
   }
 }
 
@@ -215,7 +224,48 @@ const getCurrentGroupScope = (structurePath: string | undefined, uiSchema: any):
   return lastFoundScope
 }
 
+/**
+ * Removes the UI schema subtree at `path` and all JSON Schema properties referenced by Controls inside it.
+ * Shared by removeFieldOrLayout (trash/drag) and aiRemoveLayout.
+ *
+ * @returns true if the node was removed, false if the path is invalid or the index is out of range.
+ */
+function removeSubtreeAtUiPath(state: JsonFormsEditState, path: string): boolean {
+  const pathSegments = pathToPathSegments(path)
+  if (pathSegments.length < 2) {
+    return false
+  }
 
+  const subtree = jsonpointer.get(state.uiSchema, pathSegmentsToJSONPointer(pathSegments)) as UISchemaElement | undefined
+  if (!subtree) {
+    return false
+  }
+
+  const parent = getParentUISchemaElements(path, state.uiSchema)
+  if (!Array.isArray(parent)) {
+    return false
+  }
+  const elIndex = parseInt(pathSegments[pathSegments.length - 1], 10)
+  if (isNaN(elIndex) || elIndex < 0 || elIndex >= parent.length) {
+    return false
+  }
+
+  const scopesToRemove = collectControlScopesInSubtree(subtree, path, state.uiSchema)
+  for (const scope of scopesToRemove) {
+    try {
+      state.jsonSchema = deeplyRemoveAtJsonSchemaPath(state.jsonSchema, scopeToJsonSchemaPath(scope))
+    } catch (e) {
+      console.warn('removeSubtreeAtUiPath: could not remove JSON schema property for scope', scope, e)
+    }
+  }
+
+  if (path === state.selectedPath) {
+    state.selectedPath = undefined
+  }
+
+  parent.splice(elIndex, 1)
+  return true
+}
 
 export const jsonFormsEditSlice = createSlice({
   name: 'jsonFormEdit',
@@ -262,6 +312,7 @@ export const jsonFormsEditSlice = createSlice({
       jsonpointer.set(state.uiSchema, pathSegmentsToJSONPointer(pathToPathSegments(path)), updatedUIschema)
       // only update json schema if ui schema has a scope
       if (uiSchema?.scope) {
+        const absoluteScope = resolveAbsoluteScope(state.uiSchema, path, uiSchema.scope)
         const rootSchema = {
           ...state.jsonSchema,
           [state.definitionsKey]: {
@@ -269,38 +320,20 @@ export const jsonFormsEditSlice = createSlice({
             ...state.definitions,
           },
         } as JsonSchema
-        const schema = resolveScopeWithoutRef(rootSchema, uiSchema.scope)
+        const schema = resolveScopeWithoutRef(rootSchema, absoluteScope)
         if (schema) {
           Object.assign(schema, updatedSchema)
         }
       }
     },
     removeFieldOrLayout: (state: JsonFormsEditState, action: PayloadAction<{ componentMeta: DraggableComponent }>) => {
-      // instead of using an abritrary path, we use the scope of the uiSchema element to remove the json schema part
-      // and the path of the uiSchema element to remove the uiSchema part
       const { uiSchema } = action.payload.componentMeta
       const { path } = uiSchema as any
       if (!path) {
         console.warn('only elements with path are removeable ')
         return
       }
-      const pathSegments = pathToPathSegments(path)
-      const parent = getParentUISchemaElements(path, state.uiSchema)
-      const elIndex = parseInt(pathSegments[pathSegments.length - 1])
-
-      if (path === state.selectedPath) {
-        state.selectedPath = undefined
-        // state.selectedElementKey = undefined
-      }
-
-      if (parent) {
-        parent.splice(elIndex, 1)
-        // state.uiSchema = removeUISchemaElement(scope, state.uiSchema)
-      }
-      // if (scope) {
-      //   state.jsonSchema = deeplyRemoveNestedProperty(state.jsonSchema, pathSegmentsToPath(scopeToPathSegments(scope)))
-      // }
-      //  state.jsonSchema = collectSchemaGarbage(state.jsonSchema, state.uiSchema)
+      removeSubtreeAtUiPath(state, path)
     },
     // renameField: (state: JsonFormsEditState, action: PayloadAction<{ path: string; newFieldName: string }>) => {
     //   //TODO: handle renaming key within data produced by the form in the current session
@@ -324,14 +357,21 @@ export const jsonFormsEditSlice = createSlice({
       if (newFieldName.includes('.')) {
         throw new Error('Field name cannot contain a dot')
       }
-      const uiSchema = jsonpointer.get(state.uiSchema, pathSegmentsToJSONPointer(pathToPathSegments(path)))
-      state.jsonSchema = deeplyRenameNestedProperty(state.jsonSchema, scopeToPathSegments(uiSchema.scope), newFieldName)
+      const uiSchemaEl = jsonpointer.get(state.uiSchema, pathSegmentsToJSONPointer(pathToPathSegments(path)))
+      const relativeScope: string = uiSchemaEl.scope
+      // For detail elements scope is relative; resolve to the actual JSON Schema path
+      const absoluteScope = resolveAbsoluteScope(state.uiSchema, path, relativeScope)
+      state.jsonSchema = deeplyRenameNestedProperty(state.jsonSchema, scopeToJsonSchemaPath(absoluteScope), newFieldName)
       if (state.uiSchema?.elements) {
-        const segments = scopeToPathSegments(uiSchema.scope)
-        segments.splice(segments.length - 1, 1, newFieldName)
-        const newScope = pathSegmentsToScope(segments)
-        // const scope = pathSegmentsToScope(strippedPath)
-        state.uiSchema = updateScopeOfUISchemaElement(uiSchema.scope, newScope, state.uiSchema)
+        // Replace last segment in both relative and absolute scopes
+        const newRelativeScope = relativeScope.replace(/\/[^/]+$/, '/' + newFieldName)
+        const newAbsoluteScope = absoluteScope.replace(/\/[^/]+$/, '/' + newFieldName)
+        // Update relative scope references (detail element scopes)
+        state.uiSchema = updateScopeOfUISchemaElement(relativeScope, newRelativeScope, state.uiSchema)
+        // Update absolute scope references (e.g. itemPropertiesScope for nested arrays)
+        if (absoluteScope !== relativeScope) {
+          state.uiSchema = updateScopeOfUISchemaElement(absoluteScope, newAbsoluteScope, state.uiSchema)
+        }
       }
       //state.uiSchema = updateScopeOfUISchemaElement()
     },
@@ -422,13 +462,25 @@ export const jsonFormsEditSlice = createSlice({
       if (isDraggableComponent(draggableMeta)) {
 
         const { name, jsonSchemaElement } = draggableMeta
-        const currentGroupScope = getCurrentGroupScope(current?.structurePath, state.uiSchema)
-
-        const groupScope = currentGroupScope || '#'
-        const groupPath = scopeToPathSegments(groupScope)
+        const groupScope =
+          findItemPropertiesScopeForDropTarget(state.uiSchema, child.path) ??
+          getCurrentGroupScope(current?.structurePath, state.uiSchema) ??
+          '#'
+        // When dropping into an array row template (itemPropertiesScope ends with /items):
+        // - groupPath uses scopeToJsonSchemaPath so /items segments are handled correctly
+        //   at any nesting depth.
+        // - uiScopeBase is '#' so detail element scopes are relative (#/properties/field)
+        //   as JSON Forms requires when rendering options.detail controls.
+        // - itemPropertiesScope of any nested array component is made absolute so further
+        //   drops inside that nested list resolve the correct JSON Schema path.
+        const isArrayDetail = groupScope.endsWith('/items')
+        const groupPath = isArrayDetail
+          ? scopeToJsonSchemaPath(groupScope)  // includes trailing 'items'
+          : scopeToPathSegments(groupScope)
+        const uiScopeBase = isArrayDetail ? '#' : groupScope
         let newKey = name
         const oldScope = concatScope('#', newKey)
-        let newScope = concatScope(groupScope, newKey)
+        let newScope = concatScope(uiScopeBase, newKey)
         const scopes = getAllScopesInSchema(state.uiSchema)
         //After collecting all scopes, that are already present in the uiSchema, we probably want to find a unique new name
         for (
@@ -437,9 +489,18 @@ export const jsonFormsEditSlice = createSlice({
           i++
         ) {
           newKey = `${draggableMeta.name}_${i}`
-          newScope = concatScope(groupScope, newKey)
+          newScope = concatScope(uiScopeBase, newKey)
         }
         uiSchema = getUiSchemaWithScope(uiSchema, oldScope, newScope)
+        // If the dropped element itself has an itemPropertiesScope (nested advanced list),
+        // make it absolute so drops inside its detail resolve correctly.
+        if (isArrayDetail) {
+          const elemOpts = (uiSchema as UISchemaElement & { options?: { itemPropertiesScope?: string } }).options
+          if (elemOpts?.itemPropertiesScope) {
+            const absoluteItemScope = concatScope(groupScope, newKey) + '/items'
+            uiSchema = { ...uiSchema, options: { ...elemOpts, itemPropertiesScope: absoluteItemScope } } as UISchemaElement
+          }
+        }
 
         if (jsonSchemaElement?.['$ref']) {
           const ref = jsonSchemaElement['$ref']
@@ -504,6 +565,17 @@ export const jsonFormsEditSlice = createSlice({
       }
       if (sourcePath === targetPath || targetPath.startsWith(sourcePath + '.')) {
         console.warn('Cannot move a layout inside itself or its descendants')
+        return
+      }
+      // Deny cross-boundary moves: elements inside an options.detail and elements outside
+      // have incompatible scopes (relative vs absolute). Moving across the boundary would
+      // leave elements with wrong scopes and corrupt both the UI schema and JSON schema.
+      const getDetailContext = (p: string) => {
+        const idx = p.lastIndexOf('.options.detail')
+        return idx >= 0 ? p.slice(0, idx + '.options.detail'.length) : ''
+      }
+      if (getDetailContext(sourcePath) !== getDetailContext(targetPath)) {
+        console.warn('Cannot move elements across an advanced list boundary')
         return
       }
       const targetIndex = index + (placeBefore ? 0 : 1)
@@ -735,6 +807,35 @@ export const jsonFormsEditSlice = createSlice({
           // property might not exist — no-op
         }
       }
+    },
+
+    /**
+     * AI-friendly: remove a layout (and nested fields) by UI schema dot-path.
+     *
+     * Use this instead of `aiRemoveElement` when deleting Group, VerticalLayout, HorizontalLayout,
+     * Categorization, etc. `aiRemoveElement` only strips a single Control by scope and does not walk
+     * nested Controls or clean JSON Schema the way the designer trash action does.
+     *
+     * **path** — Dot path from the root `uiSchema`, same as `element.path` after `extendUiSchemaWithPath`
+     * (e.g. `elements.0`, `elements.0.elements.2`). Not a JSON Pointer and not a JSON Forms `scope`.
+     *
+     * No-op if the path is missing, the node is not a layout, or removal fails (invalid index).
+     */
+    aiRemoveLayout: (state: JsonFormsEditState, action: PayloadAction<{ path: string }>) => {
+      const raw = action.payload.path?.trim()
+      if (!raw) {
+        return
+      }
+      const pathSegments = pathToPathSegments(raw)
+      const node = jsonpointer.get(state.uiSchema, pathSegmentsToJSONPointer(pathSegments)) as UISchemaElement | undefined
+      if (!node || !isLayout(node)) {
+        console.warn(
+          'aiRemoveLayout: expected a layout at path (use aiRemoveElement with a Control scope to remove a single field)',
+          raw
+        )
+        return
+      }
+      removeSubtreeAtUiPath(state, raw)
     },
 
     /**
@@ -979,6 +1080,7 @@ export const {
   aiAddField,
   aiAddLayout,
   aiRemoveElement,
+  aiRemoveLayout,
   aiUpdateField,
   aiRenameField,
   aiMoveElement,
@@ -1006,12 +1108,19 @@ export const selectUIElementFromSelection: (state: RootState) => UISchemaElement
 export const selectSelectedElementJsonSchema: (state: RootState) => JsonSchema | null | undefined = createSelector(
   selectJsonSchema,
   selectUIElementFromSelection,
-  (jsonSchema, selectedUiSchema) => {
+  selectSelectedPath,
+  selectUiSchema,
+  (jsonSchema, selectedUiSchema, selectedPath, uiSchema) => {
     if (!selectedUiSchema || !isScopableUISchemaElement(selectedUiSchema) || !selectedUiSchema.scope) {
       return null
     }
-
-    return resolveScopeWithoutRef(jsonSchema, selectedUiSchema.scope)
+    // For elements inside options.detail the stored scope is relative (#/properties/field).
+    // Resolve it against the ancestor array's itemPropertiesScope to get the absolute scope.
+    const absoluteScope =
+      selectedPath && uiSchema
+        ? resolveAbsoluteScope(uiSchema, selectedPath, selectedUiSchema.scope)
+        : selectedUiSchema.scope
+    return resolveScopeWithoutRef(jsonSchema, absoluteScope)
   }
 )
 
