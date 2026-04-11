@@ -183,7 +183,7 @@ const ListToolSettings: ToolSetting = {
   jsonSchema,
   uischemaScopeOverrides,
   tester: (uiSchema, jsonSchema, context) =>
-    isSimpleListOfObjectsForToolSettings(uiSchema, jsonSchema, context) ? 1 : 0,
+    isSimpleListOfObjectsForToolSettings(uiSchema, jsonSchema, context) ? 5 : 0,
   toolSettingsMixins: [ToolsettingParts.Title, ToolsettingParts.Description],
 }
 export default ListToolSettings
