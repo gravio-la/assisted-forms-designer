@@ -1,6 +1,8 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useStore } from 'react-redux'
 import { useDesignerTranslation } from '@formswizard/i18n'
+import type { JsonSchema } from '@formswizard/types'
 import {
   useAppDispatch,
   useAppSelector,
@@ -15,13 +17,18 @@ import {
   aiRenameField,
   aiMoveElement,
   aiUpdateLayout,
+  loadImportedSchema,
+  type RootState,
 } from '@formswizard/state'
 import { AiAssistantProvider, useAiAssistantChat } from '@graviola/agent-chat-flow'
 import type { ToolResult } from '@graviola/agent-chat-flow'
 import { WandHutFabIcon } from '@graviola/agent-chat-components'
 import { AGENT_SESSION_CUSTOM_RENDERERS } from './agentSessionCustomRenderers'
+import { buildRepairUndoPayload, type RepairUndoPayload } from './agentRepairUndoSnapshot'
 import Fab from '@mui/material/Fab'
 import CircularProgress from '@mui/material/CircularProgress'
+import Snackbar from '@mui/material/Snackbar'
+import Button from '@mui/material/Button'
 
 const SERVER_URL = import.meta.env.VITE_AGENT_SERVER_URL ?? 'http://localhost:3001'
 
@@ -68,9 +75,28 @@ export function AgentAssistant() {
   const welcomeMessage = t('aiAssistant.welcome')
 
   const dispatch = useAppDispatch()
+  const store = useStore<RootState>()
   const jsonSchema = useAppSelector(selectJsonSchema)
   const uiSchema = useAppSelector(selectUiSchema)
   const selectedElement = useAppSelector(selectUIElementFromSelection)
+
+  const repairUndoRef = useRef<RepairUndoPayload | null>(null)
+  const [repairUndoSnackbarOpen, setRepairUndoSnackbarOpen] = useState(false)
+  const [repairUndoneSnackbarOpen, setRepairUndoneSnackbarOpen] = useState(false)
+
+  const handleDismissRepairUndo = useCallback(() => {
+    setRepairUndoSnackbarOpen(false)
+    repairUndoRef.current = null
+  }, [])
+
+  const handleUndoRepair = useCallback(() => {
+    const snapshot = repairUndoRef.current
+    if (!snapshot) return
+    dispatch(loadImportedSchema(snapshot))
+    repairUndoRef.current = null
+    setRepairUndoSnackbarOpen(false)
+    setRepairUndoneSnackbarOpen(true)
+  }, [dispatch])
 
   const agentSelectedElement = selectedElement
     ? {
@@ -86,6 +112,36 @@ export function AgentAssistant() {
     (toolName: string, args: Record<string, unknown>): ToolResult => {
       try {
         switch (toolName) {
+          case 'replace_form':
+          case 'repair_form': {
+            const jsonSchemaArg = args['jsonSchema']
+            const uiSchemaArg = args['uiSchema']
+            if (jsonSchemaArg == null || typeof jsonSchemaArg !== 'object' || Array.isArray(jsonSchemaArg)) {
+              return { success: false, error: 'replace_form/repair_form: jsonSchema must be an object' }
+            }
+            if (uiSchemaArg == null || typeof uiSchemaArg !== 'object' || Array.isArray(uiSchemaArg)) {
+              return { success: false, error: 'replace_form/repair_form: uiSchema must be an object' }
+            }
+            if (toolName === 'repair_form') {
+              repairUndoRef.current = buildRepairUndoPayload(() => store.getState())
+            } else {
+              repairUndoRef.current = null
+              setRepairUndoSnackbarOpen(false)
+            }
+            dispatch(
+              loadImportedSchema({
+                jsonSchema: jsonSchemaArg as JsonSchema,
+                uiSchema: uiSchemaArg,
+              }),
+            )
+            if (toolName === 'repair_form') {
+              setRepairUndoSnackbarOpen(true)
+            }
+            return {
+              success: true,
+              message: toolName === 'repair_form' ? 'Form repaired.' : 'Form replaced.',
+            }
+          }
           case 'add_field':
             dispatch(aiAddField(args as any))
             break
@@ -115,20 +171,42 @@ export function AgentAssistant() {
         return { success: false, error: String(err) }
       }
     },
-    [dispatch],
+    [dispatch, store],
   )
 
   return (
-    <AiAssistantProvider
-      serverUrl={SERVER_URL}
-      language={sessionLanguage}
-      welcomeMessage={welcomeMessage}
-      customRenderers={AGENT_SESSION_CUSTOM_RENDERERS}
-      schema={{ jsonSchema, uiSchema }}
-      onExecuteTool={handleExecuteTool}
-      {...(agentSelectedElement !== undefined ? { selectedElement: agentSelectedElement } : {})}
-    >
-      <AssistantFABTrigger />
-    </AiAssistantProvider>
+    <>
+      <AiAssistantProvider
+        serverUrl={SERVER_URL}
+        language={sessionLanguage}
+        welcomeMessage={welcomeMessage}
+        customRenderers={AGENT_SESSION_CUSTOM_RENDERERS}
+        schema={{ jsonSchema, uiSchema }}
+        onExecuteTool={handleExecuteTool}
+        {...(agentSelectedElement !== undefined ? { selectedElement: agentSelectedElement } : {})}
+      >
+        <AssistantFABTrigger />
+      </AiAssistantProvider>
+      <Snackbar
+        open={repairUndoSnackbarOpen}
+        onClose={handleDismissRepairUndo}
+        message={t('aiAssistant.repairUndoMessage')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{ bottom: { xs: 88, sm: 100 } }}
+        action={
+          <Button color="inherit" size="small" onClick={handleUndoRepair}>
+            {t('aiAssistant.repairUndoAction')}
+          </Button>
+        }
+      />
+      <Snackbar
+        open={repairUndoneSnackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setRepairUndoneSnackbarOpen(false)}
+        message={t('aiAssistant.repairUndone')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{ bottom: { xs: 88, sm: 100 } }}
+      />
+    </>
   )
 }
