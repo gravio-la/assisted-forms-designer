@@ -3,6 +3,7 @@ import { ToolProvider } from '@formswizard/tool-context'
 import { WizardProvider, MainLayout } from '@formswizard/forms-designer'
 import { I18nProvider } from '@formswizard/i18n'
 import { basicToolsCollection } from '@formswizard/basic-tools'
+import { designerRendererToolCollection } from '@formswizard/designer-renderer'
 import { advancedToolsCollection } from '@formswizard/advanced-tools'
 import { toplevelLayoutCollection } from '@formswizard/toplevel-layout'
 
@@ -21,7 +22,12 @@ export const WithToplevelCollection: StoryObj<typeof MainLayout> = {
   render: () => (
     <I18nProvider>
       <ToolProvider
-        toolCollections={[basicToolsCollection, advancedToolsCollection, toplevelLayoutCollection]}
+        toolCollections={[
+          basicToolsCollection,
+          designerRendererToolCollection,
+          advancedToolsCollection,
+          toplevelLayoutCollection,
+        ]}
       >
         <WizardProvider>
           <MainLayout multipleDefinitions={false} />
