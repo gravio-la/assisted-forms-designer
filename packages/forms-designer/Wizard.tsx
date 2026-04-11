@@ -4,7 +4,6 @@ import { useJsonSchema } from '@formswizard/state'
 import { selectUiSchema, useAppSelector, selectPreviewModus } from '@formswizard/state'
 import { extendUiSchemaWithPath } from '@formswizard/utils'
 import { JsonSchema as JsonFormsJsonSchema } from '@jsonforms/core'
-import { useDragScrolling } from '@formswizard/react-hooks'
 import { Box, BoxProps } from '@mui/material'
 import { usePreparedJsonFormsState } from '@formswizard/tool-context'
 import { dropRenderer, previewRenderer } from '@formswizard/designer-renderer'
@@ -27,8 +26,6 @@ export function Wizard(props: WizardProps) {
 
   const uiSchema = useAppSelector(selectUiSchema)
   const uiSchemaWithPath = useMemo(() => extendUiSchemaWithPath(uiSchema), [uiSchema])
-
-  useDragScrolling()
 
   return (
     <Box {...props}>

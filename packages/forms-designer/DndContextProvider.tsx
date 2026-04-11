@@ -71,6 +71,10 @@ export function DndContextProvider({
     <DndContext
       sensors={sensors}
       collisionDetection={collisionDetection}
+      autoScroll={{
+        threshold: { x: 0, y: 0.15 },
+        acceleration: 10,
+      }}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
