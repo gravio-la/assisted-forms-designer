@@ -3,6 +3,7 @@ import {
   composeWithUi,
   ControlElement,
   getSchema,
+  isLayout,
   JsonFormsCellRendererRegistryEntry,
   JsonFormsRendererRegistryEntry,
   JsonSchema,
@@ -148,7 +149,21 @@ const LayoutElement = ({ index, schema, path, enabled, element: child, cells, re
 
   const isOverCurrent = isOverOn || isOverAfter
 
-  const isSelectable = (child as any).path && ['Control', 'Label', 'Alert'].includes(child.type)
+  // Controls with options.detail render their own interactive inner area (advanced list card).
+  // Putting a SelectionOverlay over them would intercept all clicks on the inner content.
+  // Those elements use their own Card onClick for outer selection instead.
+  const hasInnerDetail = !!(child as any).options?.detail
+  const isSelectable = !hasInnerDetail && (child as any).path && ['Control', 'Label', 'Alert'].includes(child.type)
+
+  // Layout types (VerticalLayout, HorizontalLayout, …) have no selection overlay.
+  // Group and Categorization call stopPropagation() in their own card onClick, so they
+  // never reach here. All other layout types fall through to the wrapper click handler.
+  const isLayoutSelectable =
+    !isSelectable &&
+    !hasInnerDetail &&
+    !!(child as any).path &&
+    isLayout(child) &&
+    !['Group', 'Categorization'].includes(child.type)
 
   const handleSelect = useCallback(
     (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -157,6 +172,16 @@ const LayoutElement = ({ index, schema, path, enabled, element: child, cells, re
       dispatch(selectPath((child as any).path))
     },
     [dispatch, child]
+  )
+
+  const handleWrapperClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (isLayoutSelectable) {
+        event.stopPropagation()
+        dispatch(selectPath((child as any).path))
+      }
+    },
+    [child, isLayoutSelectable, dispatch]
   )
 
   // const handleRemove = useCallback(
@@ -182,8 +207,8 @@ const LayoutElement = ({ index, schema, path, enabled, element: child, cells, re
             flexGrow: 1,
             display: 'flex',
             backgroundColor: (theme) =>
-              // @ts-ignore - Apply selection to Control, Label, Alert (Label/Alert are pure UI elements)
-              isSelectable && selectedPath === (child as any).path
+              // Highlight selected Controls/Labels/Alerts via overlay, and VerticalLayout/HorizontalLayout via wrapper
+              (isSelectable || isLayoutSelectable) && selectedPath === (child as any).path
                 ? theme.palette.action.selected
                 : 'none',
             padding: (theme) => theme.spacing(1, 2),
@@ -201,6 +226,7 @@ const LayoutElement = ({ index, schema, path, enabled, element: child, cells, re
             position: 'relative',
           }}
           ref={dragRef}
+          onClick={handleWrapperClick}
           {...dragListeners}
           {...dragAttributes}
         >

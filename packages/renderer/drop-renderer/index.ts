@@ -10,6 +10,14 @@ import {
   categorizationPreviewTester,
   MaterialPreviewCategorizationLayoutRenderer,
 } from './MaterialEditableCategorizationLayout'
+import {
+  materialEditableArrayListDetailTester,
+  MaterialEditableArrayListDetailRenderer,
+} from './MaterialEditableArrayListDetail'
+
+export { AdvancedListToolSettings, collectLabelPathOptions } from './AdvancedListToolSettings'
+export { designerRendererToolCollection } from './designerRendererToolCollection'
+export { advancedListToolTranslations } from './advancedListToolTranslations'
 
 export * from './HorizontalLayoutWithDropZoneRenderer'
 export * from './TopLevelLayoutWithDropZoneRenderer'
@@ -43,5 +51,9 @@ export const dropRenderer = [
   {
     tester: categorizationEditableTester,
     renderer: MaterialEditableCategorizationLayoutRenderer,
+  },
+  {
+    tester: materialEditableArrayListDetailTester,
+    renderer: MaterialEditableArrayListDetailRenderer,
   },
 ]

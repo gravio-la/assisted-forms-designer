@@ -41,7 +41,6 @@ const GroupComponent = React.memo(function GroupComponent({
   const handleSelect = useCallback(
     (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       event.stopPropagation();
-      // @ts-ignore - using path from uischema similar to LayoutElement
       dispatch(selectPath((uischema as any).path));
     },
     [dispatch, uischema]
