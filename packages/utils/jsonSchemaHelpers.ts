@@ -17,14 +17,32 @@ export const deeplySetNestedProperty: (
   newProperty: JsonSchema,
   ensurePath?: Boolean
 ) => JsonSchema = (schema, path, newKey, newProperty, ensurePath = false) => {
+  // Array schema: 'items' navigates into items.properties at any depth
+  if ((schema as { type?: string }).type === 'array') {
+    if (path.length === 0 || path[0] !== 'items') {
+      throw new Error(`Expected 'items' path segment for array schema`)
+    }
+    const rawItems = (schema as { items?: unknown }).items
+    const items: JsonSchema =
+      rawItems && typeof rawItems === 'object' && !Array.isArray(rawItems)
+        ? (rawItems as JsonSchema)
+        : { type: 'object', properties: {} }
+    const base: JsonSchema =
+      (items as { type?: string }).type === 'object'
+        ? items
+        : { type: 'object', properties: {}, ...(items as object) }
+    const rest = path.slice(1)
+    return {
+      ...schema,
+      items: deeplySetNestedProperty(base, rest, newKey, newProperty, ensurePath),
+    } as JsonSchema
+  }
+
   if (!schema.properties) throw new Error(`Schema has no properties`)
   if (path.length === 0) {
     return {
       ...schema,
-      properties: {
-        ...schema.properties,
-        [newKey]: newProperty,
-      },
+      properties: { ...schema.properties, [newKey]: newProperty },
     } as JsonSchema
   }
   const [first, ...rest] = path
@@ -46,9 +64,8 @@ export const deeplySetNestedProperty: (
         [first]: deeplySetNestedProperty(nestedSchema, rest, newKey, newProperty, ensurePath),
       },
     } as JsonSchema
-  } else {
-    throw new Error(`Could not find nested schema for ${first}`)
   }
+  throw new Error(`Could not find nested schema for ${first}`)
 }
 export const deeplyUpdateNestedSchema: (schema: JsonSchema, path: string[], newProperty: JsonSchema) => JsonSchema = (
   schema,
@@ -101,11 +118,61 @@ export const deeplyRemoveNestedProperty: (schema: JsonSchema, path: string) => J
     },
   } as JsonSchema
 }
+/**
+ * Remove a JSON schema property at the given path (array of key segments).
+ * Handles 'items' segments for array schemas at any depth, mirroring deeplySetNestedProperty.
+ * Silently ignores paths that don't resolve (nothing to remove).
+ *
+ * e.g. ['advancedList', 'items', 'field1'] removes advancedList.items.properties.field1
+ */
+export const deeplyRemoveAtJsonSchemaPath = (schema: JsonSchema, path: string[]): JsonSchema => {
+  if (path.length === 0) return schema
+
+  if ((schema as { type?: string }).type === 'array') {
+    if (path[0] !== 'items') return schema
+    const rawItems = (schema as { items?: unknown }).items
+    const items: JsonSchema =
+      rawItems && typeof rawItems === 'object' && !Array.isArray(rawItems)
+        ? (rawItems as JsonSchema)
+        : { type: 'object', properties: {} }
+    return { ...schema, items: deeplyRemoveAtJsonSchemaPath(items, path.slice(1)) } as JsonSchema
+  }
+
+  if (!schema.properties) return schema
+  const [first, ...rest] = path
+  if (!(first in schema.properties)) return schema
+
+  if (rest.length === 0) {
+    const { [first]: _removed, ...remaining } = schema.properties as Record<string, JsonSchema>
+    return { ...schema, properties: remaining as JsonSchema['properties'] } as JsonSchema
+  }
+
+  const nested = schema.properties[first]
+  if (!isJsonSchema(nested)) return schema
+  return {
+    ...schema,
+    properties: {
+      ...schema.properties,
+      [first]: deeplyRemoveAtJsonSchemaPath(nested as JsonSchema, rest),
+    },
+  } as JsonSchema
+}
+
 export const deeplyRenameNestedProperty: (schema: JsonSchema, path: string[], newField: string) => JsonSchema = (
   schema,
   path,
   newField
 ) => {
+  // Array schema: 'items' navigates into items
+  if ((schema as { type?: string }).type === 'array') {
+    if (path.length === 0 || path[0] !== 'items') throw new Error(`Expected 'items' path segment for array schema`)
+    const rawItems = (schema as { items?: unknown }).items
+    const items: JsonSchema =
+      rawItems && typeof rawItems === 'object' && !Array.isArray(rawItems)
+        ? (rawItems as JsonSchema)
+        : { type: 'object', properties: {} }
+    return { ...schema, items: deeplyRenameNestedProperty(items, path.slice(1), newField) } as JsonSchema
+  }
   if (!schema.properties) throw new Error(`Schema has no properties`)
   if (path.length === 0) {
     return schema
