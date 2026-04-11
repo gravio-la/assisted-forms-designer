@@ -120,12 +120,23 @@ const MapIcon: ToolIconComponent = makeSvgIcon(MapIconSvg)
 const AddressIcon: ToolIconComponent = makeSvgIcon(AddressIconSvg)
 const StarsIcon: ToolIconComponent = makeSvgIcon(StarsIconSvg)
 
+/** Stacked rows — advanced list (nested row layout) */
+const AdvancedListIconSvg: SVGIconComponent = ({ variant = 'outlined' }) => (
+  <svg {...defaultSvgStyles} {...getVariantSvgStyles(variant)}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" />
+  </svg>
+)
+
+const AdvancedListIcon: ToolIconComponent = makeSvgIcon(AdvancedListIconSvg)
+
 export const advancedComponentIcons: ToolIconRegistry = {
   Person: PersonIcon,
   Location: LocationIcon,
   Map: MapIcon,
   Address: AddressIcon,
   Stars: StarsIcon,
+  AdvancedList: AdvancedListIcon,
 }
 
 export const icons = advancedComponentIcons

@@ -15,11 +15,13 @@ export const translations: LanguageTranslations = {
     'tools.person': 'Person',
     'tools.address': 'Address',
     'tools.Location': 'Location',
+    'tools.advancedListOfObjects': 'Advanced list (nested rows)',
   },
   de: {
     // --- Toolbox element display names ---
     'tools.person': 'Person',
     'tools.address': 'Adresse',
     'tools.Location': 'Standort',
+    'tools.advancedListOfObjects': 'Erweiterte Liste (verschachtelte Zeilen)',
   },
 }

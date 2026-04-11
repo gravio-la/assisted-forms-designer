@@ -1,6 +1,33 @@
 import { updateScopeOfUISchemaElement } from '@formswizard/utils'
-import { DraggableComponent } from '@formswizard/types'
+import type { DraggableComponent } from '@formswizard/types'
+import type { UISchemaElement } from '@jsonforms/core'
+
 export const advancedDraggableComponents: DraggableComponent[] = [
+  {
+    name: 'advancedListOfObjects',
+    category: 'advanced',
+    ToolIconName: 'AdvancedList',
+    jsonSchemaElement: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {},
+      },
+    },
+    uiSchema: {
+      type: 'Control',
+      scope: '#/properties/advancedListOfObjects',
+      options: {
+        showSortButtons: true,
+        itemPropertiesScope: '#/properties/advancedListOfObjects/items',
+        iconName: 'AdvancedList',
+        detail: {
+          type: 'VerticalLayout',
+          elements: [],
+        },
+      },
+    } as UISchemaElement,
+  },
   {
     name: 'person',
     componentType: 'block',
