@@ -6,6 +6,7 @@ import type { LanguageTranslations } from '@formswizard/types'
  * Keys follow the JsonForms i18n convention:
  *   - `<propertyName>.label`  → rendered as the field label in the settings panel
  *   - `<propertyName>.<enumValue>` → enum option labels
+ *   - `<propertyName>.<oneOfConst>` → oneOf const labels (preferred for i18n)
  *
  * Mixin translations (label, description) live in the `formsdesigner`
  * namespace (seeded in @formswizard/i18n) and do NOT need to be repeated here.
@@ -34,6 +35,16 @@ export const translations: LanguageTranslations = {
 
     // --- ListToolSettings ---
     'columns.label': 'Columns',
+    'columns.description':
+      'For nested rows, use an advanced list from the palette—this panel stays off for complex item schemas.',
+    'name.label': 'Name',
+    'columnType.label': 'Type',
+    'columnType.text': 'Text',
+    'columnType.number': 'Number',
+    'columnType.email': 'Email',
+    'columnType.date': 'Date',
+    'columnType.dateTime': 'Date & time',
+    'columnType.boolean': 'Toggle (yes/no)',
     'showSortButtons.label': 'Show sort buttons',
 
     // --- AlertToolSettings ---
@@ -91,6 +102,16 @@ export const translations: LanguageTranslations = {
 
     // --- ListToolSettings ---
     'columns.label': 'Spalten',
+    'columns.description':
+      'Für verschachtelte Zeilen: erweiterte Liste aus der Palette—bei komplexen Schemas bleibt dieses Panel aus.',
+    'name.label': 'Name',
+    'columnType.label': 'Typ',
+    'columnType.text': 'Text',
+    'columnType.number': 'Zahl',
+    'columnType.email': 'E-Mail',
+    'columnType.date': 'Datum',
+    'columnType.dateTime': 'Datum und Uhrzeit',
+    'columnType.boolean': 'Schalter (Ja/Nein)',
     'showSortButtons.label': 'Sortierschaltflächen anzeigen',
 
     // --- AlertToolSettings ---
