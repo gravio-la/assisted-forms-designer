@@ -9,6 +9,7 @@ import { WizardProvider, MainLayout } from '@formswizard/forms-designer'
 import { ToolProvider } from '@formswizard/tool-context'
 import { I18nProvider } from '@formswizard/i18n'
 import { basicToolsCollection } from '@formswizard/basic-tools'
+import { designerRendererToolCollection } from '@formswizard/designer-renderer'
 import { advancedToolsCollection } from '@formswizard/advanced-tools'
 import { AvailableFontsProvider, toplevelLayoutCollection } from '@formswizard/toplevel-layout'
 import { uploadToolsCollection } from '@formswizard/upload-tools'
@@ -45,6 +46,7 @@ const App = () => (
     <ToolProvider
       toolCollections={[
         basicToolsCollection,
+        designerRendererToolCollection,
         advancedToolsCollection,
         toplevelLayoutCollection,
         uploadToolsCollection,

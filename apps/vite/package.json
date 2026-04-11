@@ -19,6 +19,7 @@
     "@fontsource/special-elite": "^5.0.0",
     "@formswizard/advanced-tools": "workspace:*",
     "@formswizard/basic-tools": "workspace:*",
+    "@formswizard/designer-renderer": "workspace:*",
     "@formswizard/forms-designer": "workspace:*",
     "@formswizard/i18n": "workspace:*",
     "@formswizard/state": "workspace:*",

@@ -13,6 +13,7 @@ import {
   aiAddField,
   aiAddLayout,
   aiRemoveElement,
+  aiRemoveLayout,
   aiUpdateField,
   aiRenameField,
   aiMoveElement,
@@ -150,6 +151,9 @@ export function AgentAssistant() {
             break
           case 'remove_element':
             dispatch(aiRemoveElement(args as any))
+            break
+          case 'remove_layout':
+            dispatch(aiRemoveLayout(args as { path: string }))
             break
           case 'update_field':
             dispatch(aiUpdateField(args as any))

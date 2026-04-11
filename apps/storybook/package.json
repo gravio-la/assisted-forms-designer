@@ -12,6 +12,7 @@
   "dependencies": {
     "@formswizard/advanced-tools": "workspace:*",
     "@formswizard/basic-tools": "workspace:*",
+    "@formswizard/designer-renderer": "workspace:*",
     "@formswizard/forms-designer": "workspace:*",
     "@formswizard/i18n": "workspace:*",
     "@formswizard/toplevel-layout": "workspace:*",
