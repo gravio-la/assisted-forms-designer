@@ -107,12 +107,12 @@ export const translations: LanguageTranslations = {
     'categories.label': 'Tabs',
 
     // --- Toolbox category labels ---
-    'toolbox.category.basic': 'Grundlagen',
-    'toolbox.category.layout': 'Layout',
+    'toolbox.category.basic': 'Basiselemente',
+    'toolbox.category.layout': 'Layouts',
     'toolbox.category.advanced': 'Erweitert',
 
     // --- Toolbox element display names ---
-    'tools.label': 'Beschriftung',
+    'tools.label': 'Label',
     'tools.alert': 'Hinweis',
     'tools.textField': 'Textfeld',
     'tools.number': 'Zahl',
@@ -120,7 +120,7 @@ export const translations: LanguageTranslations = {
     'tools.dateTimeField': 'Datums- und Zeitfeld',
     'tools.checkbox': 'Kontrollkästchen',
     'tools.multilineTextField': 'Mehrzeiliges Textfeld',
-    'tools.radioButtons': 'Optionsschaltflächen',
+    'tools.radioButtons': 'Optionsfelder',
     'tools.multiselect': 'Mehrfachauswahl',
     'tools.listOfObjects': 'Objektliste',
     'tools.horizontalLayout': 'Horizontales Layout',

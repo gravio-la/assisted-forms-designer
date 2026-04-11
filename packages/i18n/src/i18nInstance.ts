@@ -1,4 +1,5 @@
 import i18next, { type i18n, type Resource } from 'i18next'
+import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
 
 declare const __DEV__: boolean | undefined
@@ -33,6 +34,7 @@ let initialized = false
  * Two categories:
  *  - Shared mixin labels (label, description) contributed by ToolSettingParts
  *  - Generic JsonForms error messages (error.*) that are valid form-wide
+ *  - JsonForms array control UI (noDataMessage, deleteDialog*, etc.)
  */
 const FORMSDESIGNER_BASE_TRANSLATIONS: Resource = {
   en: {
@@ -48,6 +50,20 @@ const FORMSDESIGNER_BASE_TRANSLATIONS: Resource = {
       'error.minimum': 'Must be at least {{limit}}',
       'error.maximum': 'Must be at most {{limit}}',
       'error.pattern': 'Does not match the expected format',
+      'error.format': 'Invalid format',
+      'error.type': 'Invalid type',
+      'error.enum': 'Must be one of the allowed values',
+      // --- JsonForms array controls (MUI material) ---
+      'noDataMessage': 'No entries',
+      'addTooltip': 'Add entry',
+      'addAriaLabel': 'Add',
+      'deleteDialogTitle': 'Confirm deletion',
+      'deleteDialogMessage': 'Are you sure you want to delete this entry?',
+      'deleteDialogAccept': 'Delete',
+      'deleteDialogDecline': 'Cancel',
+      'up': 'Move up',
+      'down': 'Move down',
+      'removeAriaLabel': 'Remove',
       // --- AppBar ---
       'appBar.edit': 'Edit',
       'appBar.preview': 'Preview',
@@ -96,6 +112,9 @@ const FORMSDESIGNER_BASE_TRANSLATIONS: Resource = {
       'aiAssistant.welcome':
         'Welcome! I’m your form assistant — I can add fields, layouts, and refinements. Describe what you need in your own words and I’ll help you build it.',
       'aiAssistant.openFabAriaLabel': 'Open form assistant',
+      'aiAssistant.repairUndoMessage': 'Form repaired. You can restore the previous version.',
+      'aiAssistant.repairUndoAction': 'Undo',
+      'aiAssistant.repairUndone': 'Previous form restored.',
     },
   },
   de: {
@@ -111,6 +130,20 @@ const FORMSDESIGNER_BASE_TRANSLATIONS: Resource = {
       'error.minimum': 'Muss mindestens {{limit}} betragen',
       'error.maximum': 'Darf höchstens {{limit}} betragen',
       'error.pattern': 'Entspricht nicht dem erwarteten Format',
+      'error.format': 'Ungültiges Format',
+      'error.type': 'Ungültiger Typ',
+      'error.enum': 'Muss einer der erlaubten Werte sein',
+      // --- JsonForms array controls (MUI material) ---
+      'noDataMessage': 'Keine Einträge',
+      'addTooltip': 'Eintrag hinzufügen',
+      'addAriaLabel': 'Hinzufügen',
+      'deleteDialogTitle': 'Löschen bestätigen',
+      'deleteDialogMessage': 'Möchten Sie diesen Eintrag wirklich löschen?',
+      'deleteDialogAccept': 'Löschen',
+      'deleteDialogDecline': 'Abbrechen',
+      'up': 'Nach oben',
+      'down': 'Nach unten',
+      'removeAriaLabel': 'Entfernen',
       // --- AppBar ---
       'appBar.edit': 'Bearbeiten',
       'appBar.preview': 'Vorschau',
@@ -159,6 +192,10 @@ const FORMSDESIGNER_BASE_TRANSLATIONS: Resource = {
       'aiAssistant.welcome':
         'Willkommen! Ich bin dein Formular-Assistent — ich kann Felder, Layouts und Feinheiten für dich einrichten. Beschreib einfach, was du brauchst, dann setze ich das für dich um.',
       'aiAssistant.openFabAriaLabel': 'Formular-Assistent öffnen',
+      'aiAssistant.repairUndoMessage':
+        'Formular wurde ersetzt. Du kannst die vorherige Version wiederherstellen.',
+      'aiAssistant.repairUndoAction': 'Rückgängig',
+      'aiAssistant.repairUndone': 'Vorheriges Formular wurde wiederhergestellt.',
     },
   },
 }
@@ -191,18 +228,24 @@ export function initI18n(additionalResources?: Resource): Promise<unknown> {
   }
 
   return i18nInstance
+    .use(LanguageDetector)
     .use(initReactI18next)
     .init({
       resources: baseResources,
-      lng: DEFAULT_LANGUAGE,
       fallbackLng: DEFAULT_LANGUAGE,
       defaultNS: FORMSDESIGNER_NS,
       ns: [FORMSDESIGNER_NS],
       supportedLngs: ['en', 'de'],
+      nonExplicitSupportedLngs: true,
       interpolation: {
         escapeValue: false,
       },
       saveMissing: isDev,
+      detection: {
+        order: ['localStorage', 'navigator'],
+        caches: ['localStorage'],
+        lookupLocalStorage: 'fw-language',
+      },
     })
 }
 
