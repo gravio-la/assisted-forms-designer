@@ -37,15 +37,22 @@ export function useJsonFormsI18n(extraNamespaces: string[] = []): JsonFormsI18nS
       const NOT_FOUND = '__FW_I18N_NOT_FOUND__'
 
       const fn = (key: string, defaultMessage?: string): string | undefined => {
-        // JsonForms passes `undefined` as defaultMessage when it expects `undefined`
-        // back if the key is missing — returning a non-undefined value (like the
-        // key string itself) would suppress JsonForms' own fallback logic and
-        // cause raw keys like "label.description" to appear in the UI.
-        if (defaultMessage === undefined) {
-          const result = tRaw(key, { ns, defaultValue: NOT_FOUND }) as string
-          return result === NOT_FOUND ? undefined : result
+        // Always use the sentinel as the i18next defaultValue so we can reliably
+        // detect "key not found" regardless of i18next version quirks:
+        //   - i18next v25 ignores null/undefined defaultValues (returns the key)
+        //   - saveMissing in dev mode can cache the sentinel if called first with
+        //     defaultMessage===undefined, then return it on a later call that has a
+        //     real defaultMessage — causing __FW_I18N_NOT_FOUND__ to appear in the UI.
+        // By always using the sentinel we detect both "not found" and "cached sentinel"
+        // in one place and fall through to JsonForms' own defaultMessage.
+        const result = tRaw(key, { ns, defaultValue: NOT_FOUND }) as string
+        if (result === NOT_FOUND || result === key) {
+          // Key is absent from all our namespaces — respect JsonForms' contract:
+          //   • undefined → let JsonForms try its own further fallbacks
+          //   • string   → pass the user-set label/description through as-is
+          return defaultMessage
         }
-        return String(tRaw(key, { defaultValue: defaultMessage, ns }))
+        return result
       }
       return fn as JsonFormsI18nState['translate']
     },
