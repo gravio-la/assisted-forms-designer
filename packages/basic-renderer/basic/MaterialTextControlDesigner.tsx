@@ -12,4 +12,4 @@ const MaterialTextControlDesignerInner = (props: ControlProps) => (
 export const MaterialTextControlDesigner = withJsonFormsControlProps(MaterialTextControlDesignerInner)
 
 /** Beats stock MaterialTextControl (rank 1) to apply minRows for multiline. */
-export const materialTextControlDesignerTester: RankedTester = rankWith(2, isStringControl)
+export const materialTextControlDesignerTester: RankedTester = rankWith(1, isStringControl)
